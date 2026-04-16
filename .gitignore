@@ -55,4 +55,4 @@ docker-compose.override.yml
 
 # Misc
 *.swp# created by virtualenv automatically
-*
+
