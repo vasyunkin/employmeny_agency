@@ -4,7 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="81e9a9ef-f306-4441-9ee8-278b5e2aeba6" name="Changes" comment="" />
+    <list default="true" id="81e9a9ef-f306-4441-9ee8-278b5e2aeba6" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/pytest.ini" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/DAL/tables/base.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/DAL/tables/map.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/DAL/tables/user.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/dal/conftest.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/dal/test_sql_user_repository.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/create-tables.sql" beforeDir="false" afterPath="$PROJECT_DIR$/create-tables.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/domain/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/domain/user.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -40,6 +52,11 @@
     "settings.editor.selected.configurable": "preferences.pluginManager"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\vasyu\PycharmProjects\university\employment-agency\tests\dal" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>

@@ -11,7 +11,7 @@ CREATE TABLE users (
     password_hash VARCHAR NOT NULL,
     user_role user_roles NOT NULL DEFAULT 'applicant',
     first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL
 );
 
 
@@ -25,8 +25,7 @@ CREATE TABLE resumes (
     education TEXT,
     resume_status res_and_vac_statuses  NOT NULL DEFAULT 'active',
 
-    CONSTRAINT fk_resumes_applicant
-        FOREIGN KEY (applicant_id)
+    FOREIGN KEY (applicant_id)
         REFERENCES users(user_id)
         ON DELETE CASCADE
 );
@@ -41,8 +40,7 @@ CREATE TABLE vacancies(
     responsibilities VARCHAR,
     vacancy_status res_and_vac_statuses NOT NULL DEFAULT 'active',
 
-    CONSTRAINT fk_vacancies_employer
-        FOREIGN KEY (employer_id)
+    FOREIGN KEY (employer_id)
         REFERENCES users(user_id)
         ON DELETE CASCADE
 );
@@ -55,34 +53,30 @@ CREATE TABLE matches(
     recruiter_id INTEGER NOT NULL,
     match_status match_statuses NOT NULL DEFAULT 'created',
 
-    CONSTRAINT fk_matches_resume
-        FOREIGN KEY (resume_id)
+    FOREIGN KEY (resume_id)
         REFERENCES resumes(resume_id)
         ON DELETE CASCADE,
 
-    CONSTRAINT fk_matches_vacancy
-        FOREIGN KEY (vacancy_id)
+    FOREIGN KEY (vacancy_id)
         REFERENCES vacancies(vacancy_id)
         ON DELETE CASCADE,
 
-    CONSTRAINT fk_matches_recruiter
-        FOREIGN KEY (recruiter_id)
+    FOREIGN KEY (recruiter_id)
         REFERENCES users(user_id)
         ON DELETE CASCADE,
 
-    CONSTRAINT unique_match UNIQUE (resume_id, vacancy_id)
+    UNIQUE (resume_id, vacancy_id)
 );
 
 
 CREATE TABLE notifications(
-    notification_id SERIAL PRIMARY KEY
+    notification_id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
     notification_type VARCHAR(50),
-    messege VARCHAR,
+    message VARCHAR,
     notification_status notification_statuses NOT NULL DEFAULT 'send',
 
-    CONSTRAINT fk_notifications_user
-        FOREIGN KEY (user_id)
+    FOREIGN KEY (user_id)
         REFERENCES users(user_id)
         ON DELETE CASCADE
 );
@@ -94,8 +88,7 @@ CREATE TABLE interview_slots(
     slot_datetime TIMESTAMP NOT NULL,
     slot_status slot_statuses NOT NULL DEFAULT 'unavailable',
 
-    CONSTRAINT fk_slots_employer
-        FOREIGN KEY (employer_id)
+    FOREIGN KEY (employer_id)
         REFERENCES users(user_id)
         ON DELETE CASCADE
 );
@@ -108,13 +101,11 @@ CREATE TABLE interviews(
     feedback_applicant BOOLEAN NOT NULL DEFAULT FALSE,
     feedback_employer BOOLEAN NOT NULL DEFAULT FALSE,
 
-    CONSTRAINT fk_interviews_match
-        FOREIGN KEY (match_id)
+    FOREIGN KEY (match_id)
         REFERENCES matches(match_id)
         ON DELETE CASCADE,
-    
-    CONSTRAINT fk_interviews_slot
-        FOREIGN KEY (slot_id)
+
+    FOREIGN KEY (slot_id)
         REFERENCES interview_slots(slot_id)
         ON DELETE CASCADE
 );

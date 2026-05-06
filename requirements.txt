@@ -1,1 +1,4 @@
 SQLAlchemy
+pytest
+pytest-asyncio
+testcontainers[postgres]

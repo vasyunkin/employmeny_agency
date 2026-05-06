@@ -10,9 +10,9 @@ class UserRole(Enum):
 
 @dataclass
 class User:
-    id: int
-    login: str
-    pswd_hash: str
+    user_id: int
+    user_login: str
+    password_hash: str
     first_name: str
     last_name: str
     user_role: UserRole = UserRole.APPLICANT
