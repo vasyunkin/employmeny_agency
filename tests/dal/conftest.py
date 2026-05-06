@@ -9,7 +9,7 @@ from testcontainers.postgres import PostgresContainer
 
 @pytest.fixture(scope="session")
 def postgres_container():
-    """Запускаем контейнер Postgres через testcontainers"""
+    """Запускаем контейнер Postgres"""
     with PostgresContainer("postgres:15-alpine", driver="asyncpg") as postgres:
         yield {
             "host": postgres.get_container_host_ip(),
@@ -31,18 +31,21 @@ async def postgres_engine(postgres_container, request):
     engine = create_async_engine(DATABASE_URL, echo=False)
 
     async with engine.begin() as conn:
-        # Очистка и создание схемы
         await conn.execute(text("DROP SCHEMA public CASCADE;"))
         await conn.execute(text("CREATE SCHEMA public;"))
 
-        # Чтение твоего SQL скрипта
         sql_path = Path(request.config.rootpath) / "create-tables.sql"
-        sql_script = sql_path.read_text(encoding="utf-8")
-
-        for statement in sql_script.split(";"):
-            cleaned_statement = statement.strip()
-            if cleaned_statement:
-                await conn.execute(text(cleaned_statement))
+        if sql_path.exists():
+            sql_script = sql_path.read_text(encoding="utf-8")
+            for statement in sql_script.split(";"):
+                cleaned = statement.strip()
+                if cleaned:
+                    await conn.execute(text(cleaned))
+        else:
+            # Если нет sql-скрипта — создаём таблицы через metadata
+            from src.DAL.tables.base import Base
+            from src.DAL.tables.user_orm import UserORM  # для импорта модели
+            await conn.run_sync(Base.metadata.create_all)
 
     yield engine
     await engine.dispose()
@@ -50,7 +53,7 @@ async def postgres_engine(postgres_container, request):
 
 @pytest_asyncio.fixture
 async def db_session(postgres_engine):
-    """Сессия с откатом для изоляции тестов"""
+    """Сессия с автоматическим rollback после теста"""
     async_session = async_sessionmaker(
         bind=postgres_engine,
         class_=AsyncSession,
@@ -60,3 +63,13 @@ async def db_session(postgres_engine):
     async with async_session() as session:
         yield session
         await session.rollback()
+
+
+@pytest_asyncio.fixture
+def async_session_maker(postgres_engine):
+    """Фабрика сессий для UnitOfWork"""
+    return async_sessionmaker(
+        bind=postgres_engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+    )

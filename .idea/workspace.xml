@@ -5,17 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="81e9a9ef-f306-4441-9ee8-278b5e2aeba6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/pytest.ini" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/DAL/tables/base.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/DAL/tables/map.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/DAL/tables/user.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/dal/conftest.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/dal/test_sql_user_repository.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/DAL/interfaces/uow_protocol.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/DAL/mappers/user_mapper.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/DAL/tables/user_orm.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/DAL/uow.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/create-tables.sql" beforeDir="false" afterPath="$PROJECT_DIR$/create-tables.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/domain/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/domain/user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/DAL/repositories/sql_user_repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/DAL/repositories/sql_user_repository.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/DAL/tables/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/DAL/tables/base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/DAL/tables/map.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/DAL/tables/user.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/dal/test_sql_user_repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/dal/test_sql_user_repository.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

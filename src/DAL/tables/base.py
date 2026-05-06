@@ -1,5 +1,5 @@
 from sqlalchemy import MetaData
-from sqlalchemy.orm import registry
+from sqlalchemy.orm import DeclarativeBase
 
 
 metadata: MetaData = MetaData(
@@ -13,4 +13,5 @@ metadata: MetaData = MetaData(
 )
 
 
-mapper_registry: registry = registry(metadata=metadata)
+class Base(DeclarativeBase):
+    metadata = metadata
