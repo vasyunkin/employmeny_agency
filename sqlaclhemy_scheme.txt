@@ -1,0 +1,26 @@
+схема работы sqlalchemy
+PostgresConfig                                       main/config.py
+      ↓
+create_async_engine(...)  →  Engine                  DAL/database.py
+      ↓
+async_sessionmaker(engine) → SessionMaker            DAL/database.py
+      ↓
+          async with session_maker() as session:     main/ioc/providers
+                  ↓
+               AsyncSession  (Unit of Work)          main/ioc/providers
+                  ↓
+           Репозитории (SQLUserRepository и т.д.)    DAL/repositories
+
+
+
+Уровень         Что делает                       Кто использует      Время жизни
+
+Engine          "Подключение к БД,
+                пул соединений, диалект"        sessionmaker,        На всё приложение (Scope.APP)
+
+SessionMaker    Фабрика для создания сессий     Dishka Provider      На всё приложение
+
+AsyncSession    Unit of Work, dirty tracking,   Репозитории          На один запрос (Scope.REQUEST)
+                транзакции                      +TransactionManager
+
+Репозитории     Бизнес-операции                 Интеракторы          На один запрос

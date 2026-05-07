@@ -6,6 +6,8 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from testcontainers.postgres import PostgresContainer
 
+from src.DAL.tables.map import map_tables
+
 
 @pytest.fixture(scope="session")
 def postgres_container():
@@ -51,6 +53,8 @@ async def postgres_engine(postgres_container, request):
 @pytest_asyncio.fixture
 async def db_session(postgres_engine):
     """Сессия с откатом для изоляции тестов"""
+    map_tables()
+
     async_session = async_sessionmaker(
         bind=postgres_engine,
         class_=AsyncSession,

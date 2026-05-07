@@ -14,3 +14,4 @@
 но сначала нужен postgreconfig. Как правильно указать пароль в .env?
 
 2026.05.07 20:40 - 21:00 - прописал get_session_maker
+позже понадобится так-же прописать provider при помощи dishka в main/ioc/providers
