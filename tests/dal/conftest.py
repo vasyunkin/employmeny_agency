@@ -7,9 +7,10 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from testcontainers.postgres import PostgresContainer
 
 
-@pytest.fixture(scope="session")
-def postgres_container():
-    """Запускаем контейнер Postgres"""
+# ==================== Важные настройки ====================
+@pytest_asyncio.fixture(scope="session", loop_scope="session")
+async def postgres_container():
+    """Запускаем Postgres контейнер один раз на всю сессию тестов"""
     with PostgresContainer("postgres:15-alpine", driver="asyncpg") as postgres:
         yield {
             "host": postgres.get_container_host_ip(),
@@ -20,56 +21,58 @@ def postgres_container():
         }
 
 
-@pytest_asyncio.fixture(scope="session")
+@pytest_asyncio.fixture(scope="session", loop_scope="session")
 async def postgres_engine(postgres_container, request):
-    """Создаем engine и накатываем таблицы"""
+    """Создаём engine + таблицы"""
     DATABASE_URL = (
         f"postgresql+asyncpg://{postgres_container['user']}:{postgres_container['password']}@"
         f"{postgres_container['host']}:{postgres_container['port']}/{postgres_container['db']}"
     )
 
-    engine = create_async_engine(DATABASE_URL, echo=False)
+    engine = create_async_engine(DATABASE_URL, echo=False, future=True)
 
     async with engine.begin() as conn:
         await conn.execute(text("DROP SCHEMA public CASCADE;"))
         await conn.execute(text("CREATE SCHEMA public;"))
 
+        # Пытаемся использовать SQL-скрипт, если есть
         sql_path = Path(request.config.rootpath) / "create-tables.sql"
         if sql_path.exists():
             sql_script = sql_path.read_text(encoding="utf-8")
-            for statement in sql_script.split(";"):
-                cleaned = statement.strip()
+            for stmt in sql_script.split(";"):
+                cleaned = stmt.strip()
                 if cleaned:
                     await conn.execute(text(cleaned))
         else:
-            # Если нет sql-скрипта — создаём таблицы через metadata
+            # Fallback — создаём через SQLAlchemy
             from src.DAL.tables.base import Base
-            from src.DAL.tables.user_orm import UserORM  # для импорта модели
             await conn.run_sync(Base.metadata.create_all)
 
     yield engine
     await engine.dispose()
 
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(scope="function", loop_scope="function")
 async def db_session(postgres_engine):
-    """Сессия с автоматическим rollback после теста"""
+    """Сессия для обычных тестов репозитория (с rollback)"""
     async_session = async_sessionmaker(
         bind=postgres_engine,
         class_=AsyncSession,
         expire_on_commit=False,
+        autoflush=False,
     )
 
     async with async_session() as session:
         yield session
-        await session.rollback()
+        await session.rollback()   # Откатываем изменения после каждого теста
 
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(scope="function", loop_scope="function")
 def async_session_maker(postgres_engine):
     """Фабрика сессий для UnitOfWork"""
     return async_sessionmaker(
         bind=postgres_engine,
         class_=AsyncSession,
         expire_on_commit=False,
+        autoflush=False,
     )
