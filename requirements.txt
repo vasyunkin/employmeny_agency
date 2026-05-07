@@ -4,3 +4,4 @@ pytest-asyncio
 testcontainers[postgres]
 pydantic
 pydantic-settings
+alembic

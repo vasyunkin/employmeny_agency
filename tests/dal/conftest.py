@@ -1,9 +1,8 @@
-from pathlib import Path
-
 import pytest
 import pytest_asyncio
+from pathlib import Path
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from testcontainers.postgres import PostgresContainer
 
 from src.DAL.tables.map import map_tables
@@ -11,7 +10,6 @@ from src.DAL.tables.map import map_tables
 
 @pytest.fixture(scope="session")
 def postgres_container():
-    """Запускаем контейнер Postgres через testcontainers"""
     with PostgresContainer("postgres:15-alpine", driver="asyncpg") as postgres:
         yield {
             "host": postgres.get_container_host_ip(),
@@ -23,8 +21,8 @@ def postgres_container():
 
 
 @pytest_asyncio.fixture(scope="session")
-async def postgres_engine(postgres_container, request):
-    """Создаем engine и накатываем таблицы"""
+async def postgres_engine(postgres_container):
+    """Создаём тестовую БД через create-tables.sql"""
     DATABASE_URL = (
         f"postgresql+asyncpg://{postgres_container['user']}:{postgres_container['password']}@"
         f"{postgres_container['host']}:{postgres_container['port']}/{postgres_container['db']}"
@@ -33,18 +31,18 @@ async def postgres_engine(postgres_container, request):
     engine = create_async_engine(DATABASE_URL, echo=False)
 
     async with engine.begin() as conn:
-        # Очистка и создание схемы
+        # Полная очистка и создание схемы
         await conn.execute(text("DROP SCHEMA public CASCADE;"))
         await conn.execute(text("CREATE SCHEMA public;"))
 
-        # Чтение твоего SQL скрипта
-        sql_path = Path(request.config.rootpath) / "create-tables.sql"
+        # Выполняем твой create-tables.sql
+        sql_path = Path(__file__).parent.parent.parent / "create-tables.sql"
         sql_script = sql_path.read_text(encoding="utf-8")
 
         for statement in sql_script.split(";"):
-            cleaned_statement = statement.strip()
-            if cleaned_statement:
-                await conn.execute(text(cleaned_statement))
+            cleaned = statement.strip()
+            if cleaned and not cleaned.startswith("--"):
+                await conn.execute(text(cleaned))
 
     yield engine
     await engine.dispose()
@@ -52,15 +50,15 @@ async def postgres_engine(postgres_container, request):
 
 @pytest_asyncio.fixture
 async def db_session(postgres_engine):
-    """Сессия с откатом для изоляции тестов"""
-    map_tables()
-
+    """Сессия для каждого теста"""
     async_session = async_sessionmaker(
         bind=postgres_engine,
         class_=AsyncSession,
         expire_on_commit=False,
+        autoflush=False,
     )
 
     async with async_session() as session:
+        map_tables()           # imperative mapping
         yield session
-        await session.rollback()
+        await session.rollback()   # откатываем все изменения теста
