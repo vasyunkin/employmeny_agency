@@ -7,10 +7,9 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from testcontainers.postgres import PostgresContainer
 
 
-# ==================== Важные настройки ====================
-@pytest_asyncio.fixture(scope="session", loop_scope="session")
-async def postgres_container():
-    """Запускаем Postgres контейнер один раз на всю сессию тестов"""
+@pytest.fixture(scope="session")
+def postgres_container():
+    """Запускаем контейнер Postgres через testcontainers"""
     with PostgresContainer("postgres:15-alpine", driver="asyncpg") as postgres:
         yield {
             "host": postgres.get_container_host_ip(),
@@ -21,58 +20,43 @@ async def postgres_container():
         }
 
 
-@pytest_asyncio.fixture(scope="session", loop_scope="session")
+@pytest_asyncio.fixture(scope="session")
 async def postgres_engine(postgres_container, request):
-    """Создаём engine + таблицы"""
+    """Создаем engine и накатываем таблицы"""
     DATABASE_URL = (
         f"postgresql+asyncpg://{postgres_container['user']}:{postgres_container['password']}@"
         f"{postgres_container['host']}:{postgres_container['port']}/{postgres_container['db']}"
     )
 
-    engine = create_async_engine(DATABASE_URL, echo=False, future=True)
+    engine = create_async_engine(DATABASE_URL, echo=False)
 
     async with engine.begin() as conn:
+        # Очистка и создание схемы
         await conn.execute(text("DROP SCHEMA public CASCADE;"))
         await conn.execute(text("CREATE SCHEMA public;"))
 
-        # Пытаемся использовать SQL-скрипт, если есть
+        # Чтение твоего SQL скрипта
         sql_path = Path(request.config.rootpath) / "create-tables.sql"
-        if sql_path.exists():
-            sql_script = sql_path.read_text(encoding="utf-8")
-            for stmt in sql_script.split(";"):
-                cleaned = stmt.strip()
-                if cleaned:
-                    await conn.execute(text(cleaned))
-        else:
-            # Fallback — создаём через SQLAlchemy
-            from src.DAL.tables.base import Base
-            await conn.run_sync(Base.metadata.create_all)
+        sql_script = sql_path.read_text(encoding="utf-8")
+
+        for statement in sql_script.split(";"):
+            cleaned_statement = statement.strip()
+            if cleaned_statement:
+                await conn.execute(text(cleaned_statement))
 
     yield engine
     await engine.dispose()
 
 
-@pytest_asyncio.fixture(scope="function", loop_scope="function")
+@pytest_asyncio.fixture
 async def db_session(postgres_engine):
-    """Сессия для обычных тестов репозитория (с rollback)"""
+    """Сессия с откатом для изоляции тестов"""
     async_session = async_sessionmaker(
         bind=postgres_engine,
         class_=AsyncSession,
         expire_on_commit=False,
-        autoflush=False,
     )
 
     async with async_session() as session:
         yield session
-        await session.rollback()   # Откатываем изменения после каждого теста
-
-
-@pytest_asyncio.fixture(scope="function", loop_scope="function")
-def async_session_maker(postgres_engine):
-    """Фабрика сессий для UnitOfWork"""
-    return async_sessionmaker(
-        bind=postgres_engine,
-        class_=AsyncSession,
-        expire_on_commit=False,
-        autoflush=False,
-    )
+        await session.rollback()
