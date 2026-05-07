@@ -2,3 +2,5 @@ SQLAlchemy
 pytest
 pytest-asyncio
 testcontainers[postgres]
+pydantic
+pydantic-settings
