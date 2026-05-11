@@ -1,5 +1,4 @@
 CREATE TYPE user_roles AS ENUM ('applicant', 'employer', 'recruiter');
-CREATE TYPE res_and_vac_statuses AS ENUM ('active', 'closed');
 CREATE TYPE match_statuses AS ENUM ('created', 'approved', 'rejected', 'scheduled', 'completed');
 CREATE TYPE notification_statuses AS ENUM ('send', 'read');
 CREATE TYPE slot_statuses AS ENUM ('available', 'unavailable', 'selected');
@@ -23,7 +22,7 @@ CREATE TABLE resumes (
     experience_years INTEGER DEFAULT 0 CHECK (experience_years >= 0),
     skills TEXT,
     education TEXT,
-    resume_status res_and_vac_statuses  NOT NULL DEFAULT 'active',
+    resume_status BOOLEAN NOT NULL DEFAULT TRUE,
 
     FOREIGN KEY (applicant_id)
         REFERENCES users(user_id)
@@ -34,11 +33,11 @@ CREATE TABLE resumes (
 CREATE TABLE vacancies(
     vacancy_id SERIAL PRIMARY KEY,
     employer_id INTEGER NOT NULL,
-    title VARCHAR(100),
+    title VARCHAR(100) NOT NULL,
     salary DECIMAL(10,2),
     requirements VARCHAR,
     responsibilities VARCHAR,
-    vacancy_status res_and_vac_statuses NOT NULL DEFAULT 'active',
+    vacancy_status BOOLEAN NOT NULL DEFAULT TRUE,
 
     FOREIGN KEY (employer_id)
         REFERENCES users(user_id)
@@ -48,8 +47,8 @@ CREATE TABLE vacancies(
 
 CREATE TABLE matches(
     match_id SERIAL PRIMARY KEY,
-    resume_id INTEGER NOT NULL,
-    vacancy_id INTEGER NOT NULL,
+    resume_id INTEGER,
+    vacancy_id INTEGER,
     recruiter_id INTEGER NOT NULL,
     match_status match_statuses NOT NULL DEFAULT 'created',
 
