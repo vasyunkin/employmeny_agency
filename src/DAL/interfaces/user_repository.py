@@ -12,3 +12,11 @@ class UserRepository(Protocol):
     @abstractmethod
     async def get_by_id(self, user_id: int) -> User | None:
         ...
+
+    @abstractmethod
+    async def get_by_login(self, user_login: str) -> User | None:
+        ...
+
+    @abstractmethod
+    async def exists_by_login(user_login: str) -> bool:
+        ...
