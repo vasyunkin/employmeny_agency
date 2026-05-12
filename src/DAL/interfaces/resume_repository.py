@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Protocol
+from typing import Protocol, Optional
 
 from src.domain.resume import Resume
 
@@ -18,6 +18,10 @@ class ResumeRepository(Protocol):
         ...
 
     @abstractmethod
+    async def deactivate(self, resume_id: int) -> None:
+        ...
+
+    @abstractmethod
     async def exists_similar(
         self,
         applicant_id: int,
@@ -25,6 +29,12 @@ class ResumeRepository(Protocol):
     ) -> bool:
         ...
 
-    @abstractmethod
-    async def search(self) -> list[Resume]:
+    async def search(
+            self,
+            desired_position: Optional[str] = None,
+            min_experience: Optional[int] = None,
+            is_active: Optional[bool] = True,
+            limit: int = 50,
+            offset: int = 0
+    ) -> list[Resume]:
         ...

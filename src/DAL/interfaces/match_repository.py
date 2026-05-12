@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Protocol
+from typing import Protocol, Optional
 
 from src.domain.match import Match
 
@@ -26,6 +26,14 @@ class MatchRepository(Protocol):
         ...
 
     @abstractmethod
+    async def get_by_resume_and_vacancy(
+            self,
+            resume_id: int,
+            vacancy_id: int
+    ) -> Match | None:
+        ...
+
+    @abstractmethod
     async def list_by_recruiter(self, recruiter_id: int) -> list[Match]:
         ...
 
@@ -37,6 +45,11 @@ class MatchRepository(Protocol):
     async def list_by_vacancy(self, vacancy_id: int) -> list[Match]:
         ...
 
-    @abstractmethod
-    async def search(self) -> list[Match]:
+    async def search(
+            self,
+            recruiter_id: Optional[int] = None,
+            status: Optional[MatchStatus] = None,
+            limit: int = 50,
+            offset: int = 0
+    ) -> list[Match]:
         ...
