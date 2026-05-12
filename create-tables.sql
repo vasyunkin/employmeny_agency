@@ -1,6 +1,5 @@
 CREATE TYPE user_roles AS ENUM ('applicant', 'employer', 'recruiter');
 CREATE TYPE match_statuses AS ENUM ('created', 'approved', 'rejected', 'scheduled', 'completed');
-CREATE TYPE notification_statuses AS ENUM ('send', 'read');
 CREATE TYPE slot_statuses AS ENUM ('available', 'unavailable', 'selected');
 
 
@@ -73,7 +72,7 @@ CREATE TABLE notifications(
     user_id INTEGER NOT NULL,
     notification_type VARCHAR(50),
     message VARCHAR,
-    notification_status notification_statuses NOT NULL DEFAULT 'send',
+    notification_status BOOLEAN NOT NULL DEFAULT FALSE,
 
     FOREIGN KEY (user_id)
         REFERENCES users(user_id)
@@ -83,22 +82,23 @@ CREATE TABLE notifications(
 
 CREATE TABLE interview_slots(
     slot_id SERIAL PRIMARY KEY,
-    employer_id INTEGER,
+    employer_id INTEGER NOT NULL,
     slot_datetime TIMESTAMP NOT NULL,
-    slot_status slot_statuses NOT NULL DEFAULT 'unavailable',
 
     FOREIGN KEY (employer_id)
         REFERENCES users(user_id)
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+
+    UNIQUE (employer_id, slot_datetime)
 );
 
 
 CREATE TABLE interviews(
     interview_id SERIAL PRIMARY KEY,
-    match_id INTEGER NOT NULL,
-    slot_id INTEGER NOT NULL,
-    feedback_applicant BOOLEAN NOT NULL DEFAULT FALSE,
-    feedback_employer BOOLEAN NOT NULL DEFAULT FALSE,
+    match_id INTEGER NOT NULL UNIQUE,
+    slot_id INTEGER NOT NULL UNIQUE,
+    feedback_applicant BOOLEAN DEFAULT FALSE,
+    feedback_employer BOOLEAN DEFAULT FALSE,
 
     FOREIGN KEY (match_id)
         REFERENCES matches(match_id)

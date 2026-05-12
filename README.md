@@ -22,6 +22,8 @@
 2026.05.12 13:50 - 15:50 - прописал orm модели для vacancies, resumes, matches
 
 2026.05.12 18:30 - 19:00 - прописал интерфейсы репозиториев для таблиц выше.
-Нужно добавить search и возможно добавить get_all и is_active для res, vac, match
-create и update для res и vac.
+вместо get_all используется search с пустыми параметрами (или с обязательным is_active=True)
+возможно добавить update, delete и is_active для res, vac, match
+
+2026.05.12 23:30 - xxx - прописал domain и orm для остальных таблиц notifications, interview_slots, interview
 
