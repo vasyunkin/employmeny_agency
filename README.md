@@ -20,10 +20,10 @@
 
 2026.05.11 18:00 - 18:50 - прописал domain модели для vacancy, resume, match
 2026.05.12 13:50 - 15:50 - прописал orm модели для vacancies, resumes, matches
-
 2026.05.12 18:30 - 19:00 - прописал интерфейсы репозиториев для таблиц выше.
 вместо get_all используется search с пустыми параметрами (или с обязательным is_active=True)
 возможно добавить update, delete и is_active для res, vac, match
 
-2026.05.12 23:30 - xxx - прописал domain и orm для остальных таблиц notifications, interview_slots, interview
+2026.05.12 23:30 - 00:20 - прописал domain и orm для остальных таблиц notifications, interview_slots, interview
+2026.05.13 00:20 - 00:35 - прописал интерфейсы репозиторияв по таблицам выше.
 
