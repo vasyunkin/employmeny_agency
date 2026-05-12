@@ -1,6 +1,5 @@
 CREATE TYPE user_roles AS ENUM ('applicant', 'employer', 'recruiter');
 CREATE TYPE match_statuses AS ENUM ('created', 'approved', 'rejected', 'scheduled', 'completed');
-CREATE TYPE slot_statuses AS ENUM ('available', 'unavailable', 'selected');
 
 
 CREATE TABLE users (
@@ -21,7 +20,7 @@ CREATE TABLE resumes (
     experience_years INTEGER DEFAULT 0 CHECK (experience_years >= 0),
     skills TEXT,
     education TEXT,
-    resume_status BOOLEAN NOT NULL DEFAULT TRUE,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
 
     FOREIGN KEY (applicant_id)
         REFERENCES users(user_id)
@@ -36,7 +35,7 @@ CREATE TABLE vacancies(
     salary DECIMAL(10,2),
     requirements TEXT,
     responsibilities TEXT,
-    vacancy_status BOOLEAN NOT NULL DEFAULT TRUE,
+    if_active BOOLEAN NOT NULL DEFAULT TRUE,
 
     FOREIGN KEY (employer_id)
         REFERENCES users(user_id)
@@ -72,7 +71,7 @@ CREATE TABLE notifications(
     user_id INTEGER NOT NULL,
     notification_type VARCHAR(50),
     message VARCHAR,
-    notification_status BOOLEAN NOT NULL DEFAULT FALSE,
+    is_read BOOLEAN NOT NULL DEFAULT FALSE,
 
     FOREIGN KEY (user_id)
         REFERENCES users(user_id)

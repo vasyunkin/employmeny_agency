@@ -18,7 +18,7 @@ vacancies_table = Table(
     Column('salary', Numeric(10, 2)),
     Column('requirements', Text),
     Column('responsibilities', Text),
-    Column('vacancy_status', Boolean, nullable=False, server_default='True'),
+    Column('is_active', Boolean, nullable=False, server_default='True'),
 )
 
 

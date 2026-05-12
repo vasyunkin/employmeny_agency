@@ -18,5 +18,5 @@ class UserRepository(Protocol):
         ...
 
     @abstractmethod
-    async def exists_by_login(user_login: str) -> bool:
+    async def exists_by_login(self, user_login: str) -> bool:
         ...

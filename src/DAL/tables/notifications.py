@@ -16,7 +16,7 @@ notifications_table = Table(
     ),
     Column('notification_type', String(50)),
     Column('message', String),
-    Column('notification_status', Booleannullable=False, server_default='False'),
+    Column('is_read', Booleannullable=False, server_default='False'),
 )
 
 

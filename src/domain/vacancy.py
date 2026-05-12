@@ -10,7 +10,7 @@ class Vacancy:
     salary: Optional[Decimal] = None
     requirements: Optional[str] = None
     responsibilities: Optional[str] = None
-    vacancy_status: bool = True
+    is_active: bool = True
     vacancy_id: Optional[int] = None
 
     def __post_init__(self):

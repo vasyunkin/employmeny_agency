@@ -19,7 +19,7 @@ resumes_table = Table(
     Column('experience_years', Integer, server_default="0"),
     Column('skills', Text),
     Column('education', Text),
-    Column('resume_status', Boolean, nullable=False, server_default="True"),
+    Column('is_active', Boolean, nullable=False, server_default="True"),
 )
 
 

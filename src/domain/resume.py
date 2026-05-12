@@ -11,7 +11,7 @@ class Resume:
     experience_years: int = 0
     skills: Optional[str] = None
     education: Optional[str] = None
-    resume_status: bool = True
+    is_active: bool = True
     resume_id: Optional[int] = None
 
     def __post_init__(self):
