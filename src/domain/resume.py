@@ -13,3 +13,7 @@ class Resume:
     education: Optional[str] = None
     resume_status: bool = True
     resume_id: Optional[int] = None
+
+    def __post_init__(self):
+        if not self.desired_position:
+            raise ValueError('Опа! Ошибка: desired_position не может быть пустой')

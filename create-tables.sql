@@ -35,8 +35,8 @@ CREATE TABLE vacancies(
     employer_id INTEGER NOT NULL,
     title VARCHAR(100) NOT NULL,
     salary DECIMAL(10,2),
-    requirements VARCHAR,
-    responsibilities VARCHAR,
+    requirements TEXT,
+    responsibilities TEXT,
     vacancy_status BOOLEAN NOT NULL DEFAULT TRUE,
 
     FOREIGN KEY (employer_id)

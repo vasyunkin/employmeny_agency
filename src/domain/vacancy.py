@@ -3,7 +3,6 @@ from decimal import Decimal
 from typing import Optional
 
 
-
 @dataclass
 class Vacancy:
     employer_id: int
@@ -13,3 +12,7 @@ class Vacancy:
     responsibilities: Optional[str] = None
     vacancy_status: bool = True
     vacancy_id: Optional[int] = None
+
+    def __post_init__(self):
+        if not self.title:
+            raise ValueError('Опа! Ошибка: title не может быть пустым')
