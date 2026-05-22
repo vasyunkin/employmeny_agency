@@ -29,6 +29,7 @@ class ResumeRepository(Protocol):
     ) -> bool:
         ...
 
+    @abstractmethod
     async def search(
             self,
             desired_position: Optional[str] = None,
