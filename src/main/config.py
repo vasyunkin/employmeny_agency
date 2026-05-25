@@ -17,7 +17,7 @@ class PostgresConfig(BaseSettings, env_prefix="POSTGRES_"):
     port: int
     user: str
     password: SecretStr
-    db: str
+    database: str
 
     enable_logging: bool = False
 

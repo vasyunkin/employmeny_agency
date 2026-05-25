@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker
 )
 
-from src.DAL.repositories.sql_alchemy_unit_of_work import SqlAlchemyUnitOfWork
+from src.DAL.sql_alchemy_unit_of_work import SqlAlchemyUnitOfWork
 from src.main.config import PostgresConfig
 
 
@@ -34,5 +34,3 @@ async def get_uow():
         except Exception:
             await uow.rollback()
             raise
-        finally:
-            await session.close()
