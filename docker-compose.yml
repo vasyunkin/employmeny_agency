@@ -1,0 +1,9 @@
+postgres_test:
+  image: postgres:15
+  container_name: employment_test_db
+  environment:
+    POSTGRES_DB: employment_test_db
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres
+  ports:
+    - "5437:5432"

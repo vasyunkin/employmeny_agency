@@ -16,6 +16,7 @@ from src.DAL.repositories.sql_interview_slot_repository import SqlInterviewSlotR
 from src.DAL.repositories.sql_interview_repository import SqlInterviewRepository
 from src.DAL.repositories.sql_notification_repository import SqlNotificationRepository
 
+
 class SqlAlchemyUnitOfWork(UnitOfWork):
     def __init__(self, session: AsyncSession):
         self._session = session
