@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
 )
 
-from src.domain.user import User, UserRole
 from src.DAL.tables.base import metadata
 from src.DAL import tables
 from src.DAL.tables.map import map_tables
@@ -28,7 +27,6 @@ def event_loop_policy():
 async def engine():
     """Создаёт движок для тестовой БД."""
     engine = create_async_engine(TEST_DATABASE_URL)
-    map_tables()
     async with engine.begin() as conn:
         await conn.run_sync(metadata.drop_all)
         await conn.run_sync(metadata.create_all)
@@ -54,6 +52,12 @@ async def session(engine):
             await session.rollback()
         except Exception:
             pass
+
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_mapping():
+    """Маппинг выполняется только один раз за всю сессию тестов"""
+    map_tables()
 
 
 @pytest.fixture
