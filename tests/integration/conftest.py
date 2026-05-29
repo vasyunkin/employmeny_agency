@@ -15,10 +15,10 @@ from src.domain.match import Match
 from src.domain.interview_slot import InterviewSlot
 from src.domain.interview import Interview
 
-from src.DAL.tables.base import metadata
-from src.DAL import tables
-from src.DAL.tables.map import map_tables
-from src.DAL.facade import DALFacade
+from src.dal.tables.base import metadata
+from src.dal import tables
+from src.dal.tables.map import map_tables
+from src.dal.facade import DALFacade
 
 
 TEST_DATABASE_URL = (

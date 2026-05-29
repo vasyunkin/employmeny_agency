@@ -1,7 +1,7 @@
 from sqlalchemy import select, update, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.DAL.interfaces.interview_repository import InterviewRepository
+from src.dal.interfaces.interview_repository import InterviewRepository
 from src.domain.interview import Interview
 
 

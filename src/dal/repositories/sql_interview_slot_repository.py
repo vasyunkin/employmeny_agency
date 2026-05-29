@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.DAL.interfaces.interview_slot_repository import InterviewSlotRepository
+from src.dal.interfaces.interview_slot_repository import InterviewSlotRepository
 from src.domain.interview_slot import InterviewSlot
 
 

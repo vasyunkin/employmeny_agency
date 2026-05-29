@@ -1,6 +1,6 @@
 from dishka import Provider, provide, Scope
-from src.service.auth.service import AuthService
-from src.DAL.facade import DALFacade
+from src.service.auth.auth_service import AuthService
+from src.dal.facade import DALFacade
 
 
 class ServiceProvider(Provider):

@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import (
     AsyncSession
 )
 
-from src.DAL.tables.map import map_tables
+from src.dal.tables.map import map_tables
 from src.main.config import PostgresConfig
 
 

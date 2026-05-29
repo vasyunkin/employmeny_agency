@@ -3,7 +3,7 @@ from typing import Optional
 from sqlalchemy import select, update, delete, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.DAL.interfaces.match_repository import MatchRepository
+from src.dal.interfaces.match_repository import MatchRepository
 from src.domain.match import Match, MatchStatus
 
 

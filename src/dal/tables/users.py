@@ -2,7 +2,7 @@ from sqlalchemy import Table, Column, Integer, String
 from sqlalchemy.dialects.postgresql import ENUM
 
 from src.domain.user import User, UserRole
-from src.DAL.tables.base import metadata, mapper_registry
+from src.dal.tables.base import metadata, mapper_registry
 
 
 user_roles_enum = ENUM(

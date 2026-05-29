@@ -2,8 +2,8 @@ from typing import Optional, Union
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from src.DAL.sql_alchemy_unit_of_work import SqlAlchemyUnitOfWork
-from src.DAL.interfaces.unit_of_work import UnitOfWork
+from src.dal.sql_alchemy_unit_of_work import SqlAlchemyUnitOfWork
+from src.dal.interfaces.unit_of_work import UnitOfWork
 
 
 class DALFacade:
@@ -37,5 +37,5 @@ class DALFacade:
 
 
 async def get_dal_facade() -> DALFacade:
-    from src.DAL.database import async_session_factory
+    from src.dal.database import async_session_factory
     return DALFacade(async_session_factory)

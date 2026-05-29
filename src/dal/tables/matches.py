@@ -2,7 +2,7 @@ from sqlalchemy import Table, Column, Integer, ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
 from src.domain.match import Match, MatchStatus
-from src.DAL.tables.base import metadata, mapper_registry
+from src.dal.tables.base import metadata, mapper_registry
 
 
 match_statuses_enum = ENUM(

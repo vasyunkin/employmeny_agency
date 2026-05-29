@@ -1,7 +1,7 @@
 from sqlalchemy import Table, Column, String, Integer, Boolean, Numeric, ForeignKey, Text
 
 from src.domain.resume import Resume
-from src.DAL.tables.base import metadata, mapper_registry
+from src.dal.tables.base import metadata, mapper_registry
 
 
 resumes_table = Table(

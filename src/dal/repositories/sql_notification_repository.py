@@ -1,7 +1,7 @@
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.DAL.interfaces.notification_repository import NotificationRepository
+from src.dal.interfaces.notification_repository import NotificationRepository
 from src.domain.notification import Notification
 
 

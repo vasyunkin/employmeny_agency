@@ -3,7 +3,7 @@ from typing import Optional
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.DAL.interfaces.vacancy_repository import VacancyRepository
+from src.dal.interfaces.vacancy_repository import VacancyRepository
 from src.domain.vacancy import Vacancy
 
 

@@ -1,7 +1,7 @@
 from sqlalchemy import select, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.DAL.interfaces.user_repository import UserRepository
+from src.dal.interfaces.user_repository import UserRepository
 from src.domain.user import User
 
 

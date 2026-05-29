@@ -1,7 +1,7 @@
 from sqlalchemy import Table, Column, Integer, String, Boolean, ForeignKey
 
 from src.domain.notification import Notification
-from src.DAL.tables.base import metadata, mapper_registry
+from src.dal.tables.base import metadata, mapper_registry
 
 
 notifications_table = Table(

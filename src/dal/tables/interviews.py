@@ -1,7 +1,7 @@
 from sqlalchemy import Table, Column, Integer, Boolean, ForeignKey
 
 from src.domain.interview import Interview
-from src.DAL.tables.base import metadata, mapper_registry
+from src.dal.tables.base import metadata, mapper_registry
 
 
 interviews_table = Table(

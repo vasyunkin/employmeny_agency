@@ -6,10 +6,10 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 # Импортируем metadata из твоего проекта
-from src.DAL.tables.base import metadata   # ← убедись, что metadata здесь есть
+from src.dal.tables.base import metadata   # ← убедись, что metadata здесь есть
 
 # Это нужно для корректной работы imperative mapping
-from src.DAL.tables.map import map_tables
+from src.dal.tables.map import map_tables
 
 
 config = context.config

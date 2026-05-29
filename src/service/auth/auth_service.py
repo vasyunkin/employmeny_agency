@@ -4,7 +4,7 @@ from dishka import FromDishka
 from jose import jwt
 from passlib.context import CryptContext
 
-from src.DAL.facade import DALFacade
+from src.dal.facade import DALFacade
 from src.domain.user import User, UserRole
 from .dto import RegisterIn, LoginIn, TokenOut
 from .exceptions import UserAlreadyExists, InvalidCredentials

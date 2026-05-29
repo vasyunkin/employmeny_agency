@@ -1,12 +1,12 @@
 from typing import Protocol
 
-from src.DAL.interfaces.user_repository import UserRepository
-from src.DAL.interfaces.resume_repository import ResumeRepository
-from src.DAL.interfaces.vacancy_repository import VacancyRepository
-from src.DAL.interfaces.match_repository import MatchRepository
-from src.DAL.interfaces.interview_slot_repository import InterviewSlotRepository
-from src.DAL.interfaces.interview_repository import InterviewRepository
-from src.DAL.interfaces.notification_repository import NotificationRepository
+from src.dal.interfaces.user_repository import UserRepository
+from src.dal.interfaces.resume_repository import ResumeRepository
+from src.dal.interfaces.vacancy_repository import VacancyRepository
+from src.dal.interfaces.match_repository import MatchRepository
+from src.dal.interfaces.interview_slot_repository import InterviewSlotRepository
+from src.dal.interfaces.interview_repository import InterviewRepository
+from src.dal.interfaces.notification_repository import NotificationRepository
 
 
 class UnitOfWork(Protocol):

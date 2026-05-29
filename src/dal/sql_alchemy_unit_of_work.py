@@ -1,20 +1,20 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.DAL.interfaces.unit_of_work import UnitOfWork
-from src.DAL.interfaces.user_repository import UserRepository
-from src.DAL.interfaces.resume_repository import ResumeRepository
-from src.DAL.interfaces.vacancy_repository import VacancyRepository
-from src.DAL.interfaces.match_repository import MatchRepository
-from src.DAL.interfaces.interview_slot_repository import InterviewSlotRepository
-from src.DAL.interfaces.interview_repository import InterviewRepository
-from src.DAL.interfaces.notification_repository import NotificationRepository
-from src.DAL.repositories.sql_user_repository import SQLUserRepository
-from src.DAL.repositories.sql_resume_repository import SqlResumeRepository
-from src.DAL.repositories.sql_vacancy_repository import SqlVacancyRepository
-from src.DAL.repositories.sql_match_repository import SqlMatchRepository
-from src.DAL.repositories.sql_interview_slot_repository import SqlInterviewSlotRepository
-from src.DAL.repositories.sql_interview_repository import SqlInterviewRepository
-from src.DAL.repositories.sql_notification_repository import SqlNotificationRepository
+from src.dal.interfaces.unit_of_work import UnitOfWork
+from src.dal.interfaces.user_repository import UserRepository
+from src.dal.interfaces.resume_repository import ResumeRepository
+from src.dal.interfaces.vacancy_repository import VacancyRepository
+from src.dal.interfaces.match_repository import MatchRepository
+from src.dal.interfaces.interview_slot_repository import InterviewSlotRepository
+from src.dal.interfaces.interview_repository import InterviewRepository
+from src.dal.interfaces.notification_repository import NotificationRepository
+from src.dal.repositories.sql_user_repository import SQLUserRepository
+from src.dal.repositories.sql_resume_repository import SqlResumeRepository
+from src.dal.repositories.sql_vacancy_repository import SqlVacancyRepository
+from src.dal.repositories.sql_match_repository import SqlMatchRepository
+from src.dal.repositories.sql_interview_slot_repository import SqlInterviewSlotRepository
+from src.dal.repositories.sql_interview_repository import SqlInterviewRepository
+from src.dal.repositories.sql_notification_repository import SqlNotificationRepository
 
 
 class SqlAlchemyUnitOfWork(UnitOfWork):

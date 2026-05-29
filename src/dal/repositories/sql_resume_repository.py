@@ -3,7 +3,7 @@ from sqlalchemy import select, update, exists
 
 from typing import Optional
 
-from src.DAL.interfaces.resume_repository import ResumeRepository
+from src.dal.interfaces.resume_repository import ResumeRepository
 from src.domain.resume import Resume
 
 
