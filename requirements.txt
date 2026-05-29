@@ -5,3 +5,7 @@ testcontainers[postgres]
 pydantic
 pydantic-settings
 alembic
+passlib[bcrypt]
+python-jose[cryptography]
+python-multipart
+dishka

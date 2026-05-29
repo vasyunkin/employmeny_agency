@@ -1,4 +1,4 @@
-from pydantic import SecretStr
+from pydantic import SecretStr, Field
 from pydantic_settings import BaseSettings as _BaseSettings
 from pydantic_settings import SettingsConfigDict
 from sqlalchemy import URL
@@ -30,3 +30,16 @@ class PostgresConfig(BaseSettings, env_prefix="POSTGRES_"):
             port=self.port,
             database=self.db,
         ).render_as_string(hide_password=False)
+
+
+class AuthConfig(BaseSettings, env_prefix="AUTH_"):
+    """Конфигурация для аутентификации и JWT"""
+    secret_key: SecretStr = Field(..., min_length=32)
+
+    def get_secret_key(self) -> str:
+        """Возвращает секретный ключ как строку"""
+        return self.secret_key.get_secret_value()
+
+
+postgres_config = PostgresConfig()
+auth_config = AuthConfig()
