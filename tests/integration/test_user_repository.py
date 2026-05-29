@@ -1,9 +1,3 @@
-# E   RuntimeError: Task <Task pending name='Task-6' coro=<test_create_user_success() running at C:\Users\vasyu\PycharmProjects\university\employment-agency\tests\integration\test_us
-# er_repository.py:20> cb=[_run_until_complete_cb() at C:\Users\vasyu\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py:182]> got Future <Future pending cb=[BaseProtocol._on_waiter_completed()]> attached to a different loop
-# ERROR tests/integration/test_user_repository.py::test_create_user_success - sqlalchemy.exc.InterfaceError: (sqlalchemy.dialects.postgresql.asyncpg.InterfaceError) <class 'asyncpg.exceptions._base.InterfaceError'>: cannot perform operation: operation is in progress
-# 1 failed, 1 error in 1.04s
-
-
 import pytest
 
 from src.domain.user import User, UserRole
