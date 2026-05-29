@@ -1,9 +1,10 @@
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
-    async_sessionmaker
+    async_sessionmaker,
+    AsyncSession
 )
+from typing import AsyncGenerator
 
-from src.DAL.sql_alchemy_unit_of_work import SqlAlchemyUnitOfWork
 from src.main.config import PostgresConfig
 
 
@@ -21,16 +22,14 @@ engine = create_async_engine(
 async_session_factory = async_sessionmaker(
     bind=engine,
     expire_on_commit=False,
+    class_=AsyncSession,
 )
 
 
-async def get_uow():
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
+    """Предоставляет сессию БД для эндпоинтов"""
     async with async_session_factory() as session:
-        uow = SqlAlchemyUnitOfWork(session)
-
         try:
-            yield uow
-            await uow.commit()
-        except Exception:
-            await uow.rollback()
-            raise
+            yield session
+        finally:
+            await session.close()
