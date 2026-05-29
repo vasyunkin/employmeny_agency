@@ -28,7 +28,7 @@ class SqlNotificationRepository(NotificationRepository):
     async def list_unread_by_user(self, user_id: int) -> list[Notification]:
         stmt = select(Notification).where(
             (Notification.user_id == user_id) &
-            (Notification.notification_status == False)
+            (Notification.is_read == False)
         ).order_by(Notification.notification_id.desc())
 
         result = await self._session.execute(stmt)
@@ -38,7 +38,7 @@ class SqlNotificationRepository(NotificationRepository):
         stmt = (
             update(Notification)
             .where(Notification.notification_id == notification_id)
-            .values(notification_status=True)
+            .values(is_read=True)
         )
         await self._session.execute(stmt)
 
@@ -46,6 +46,6 @@ class SqlNotificationRepository(NotificationRepository):
         stmt = (
             update(Notification)
             .where(Notification.user_id == user_id)
-            .values(notification_status=True)
+            .values(is_read=True)
         )
         await self._session.execute(stmt)
