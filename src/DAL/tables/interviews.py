@@ -10,7 +10,7 @@ interviews_table = Table(
     Column(
         'interview_id',
         Integer,
-        rimary_key=True
+        primary_key=True
     ),
     Column(
         'match_id',

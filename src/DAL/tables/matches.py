@@ -8,7 +8,7 @@ from src.DAL.tables.base import metadata, mapper_registry
 match_statuses_enum = ENUM(
     MatchStatus,
     name='match_statuses',
-    create_type=False,
+    create_type=True,
     values_callable=lambda obj: [e.value for e in obj]
 )
 

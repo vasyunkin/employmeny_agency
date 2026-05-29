@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Protocol, Optional
 
-from src.domain.match import Match
+from src.domain.match import Match, MatchStatus
 
 
 class MatchRepository(Protocol):

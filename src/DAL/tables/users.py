@@ -8,7 +8,7 @@ from src.DAL.tables.base import metadata, mapper_registry
 user_roles_enum = ENUM(
     UserRole,
     name='user_roles',
-    create_type=False,
+    create_type=True,
     values_callable=lambda obj: [e.value for e in obj]
 )
 

@@ -5,7 +5,7 @@
 2026.04.16 22:30 - 0:00 - прописал domain и repository для user
 чуть позже - написал тесты и настроил докер для поднятия бд в тестах. 
 Нужно написать маппер, возможно переписать создание бд в sql на создание через sqlalchemy 
-ЗАПУСК ТЕСТОВ -> pytest tests/dal/test_sql_user_repository.py::test_create_user_success -q
+ЗАПУСК ТЕСТОВ ->  pytest tests/integration/test_user_repository.py::test_create_user_success -q
 
 2026.05.05 17:00 - 19:00 - добавлен маппер, продолжаются попытки выполнить тест
 
