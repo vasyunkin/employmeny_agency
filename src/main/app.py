@@ -1,20 +1,20 @@
 from fastapi import FastAPI
-from dishka.integrations.fastapi import setup_dishka
 
 from src.api.v1.auth import router as auth_router
-# позже добавишь другие роутеры
+from src.main.ioc import setup_di
+
 
 def create_app() -> FastAPI:
     app = FastAPI(
-        title="Employment Agency API",
-        version="0.1.0"
+        title="Employment Agency",
+        docs_url="/docs",  # Swagger UI
+        redoc_url="/redoc"
     )
 
-    # Подключаем роутеры
     app.include_router(auth_router)
-
-    # Настройка DI (dishka)
-    from src.main.ioc import get_container  # или где у тебя контейнер
-    setup_dishka(get_container(), app)
+    setup_di(app)
 
     return app
+
+
+app = create_app()

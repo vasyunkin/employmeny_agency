@@ -28,7 +28,7 @@ class PostgresConfig(BaseSettings, env_prefix="POSTGRES_"):
             password=self.password.get_secret_value(),
             host=self.host,
             port=self.port,
-            database=self.db,
+            database=self.database,
         ).render_as_string(hide_password=False)
 
 

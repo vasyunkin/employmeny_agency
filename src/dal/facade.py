@@ -8,8 +8,8 @@ from src.dal.interfaces.unit_of_work import UnitOfWork
 
 class DALFacade:
     def __init__(self, session_or_factory: Union[AsyncSession, async_sessionmaker]):
-        self._session_factory: Optional[async_sessionmaker] = None
-        self._session: Optional[AsyncSession] = None
+        self._session_factory: Optional[async_sessionmaker] = None      # для production
+        self._session: Optional[AsyncSession] = None                    # для тестов
         self._uow: Optional[SqlAlchemyUnitOfWork] = None
 
         if isinstance(session_or_factory, async_sessionmaker):
