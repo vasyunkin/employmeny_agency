@@ -2,7 +2,9 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock
 
 from src.service.resume.resume_service import ResumeService
+from src.service.vacancy.vacancy_dto import VacancyCreateIn
 from src.domain.resume import Resume
+from src.domain.vacancy import Vacancy
 
 
 @pytest.fixture
@@ -93,3 +95,32 @@ def partial_update_resume_data():
     """Данные для частичного обновления резюме"""
     from src.service.resume.resume_dto import ResumeUpdateIn
     return ResumeUpdateIn(skills="Python, SQL, Docker")
+
+
+@pytest.fixture
+def vacancy_service(mock_dal):
+    from src.service.vacancy.vacancy_service import VacancyService
+    return VacancyService(dal=mock_dal)
+
+
+@pytest.fixture
+def sample_vacancy():
+    return Vacancy(
+        vacancy_id=1,
+        employer_id=200,
+        title="Senior Python Developer",
+        salary=18000.0,
+        requirements="Python, FastAPI, SQLAlchemy",
+        responsibilities="Backend development",
+        is_active=True
+    )
+
+
+@pytest.fixture
+def create_vacancy_data():
+    return VacancyCreateIn(
+        title="Senior Python Developer",
+        salary=200000,
+        requirements="Experience with FastAPI",
+        responsibilities="API development"
+    )

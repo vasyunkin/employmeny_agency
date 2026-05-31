@@ -13,7 +13,6 @@ class ResumeService:
     async def create(self, applicant_id: int, data: ResumeCreateIn) -> ResumeOut:
         """Создание нового резюме"""
         async with self.dal.uow as uow:
-            # Проверка на дубликат по должности
             if await uow.resume.exists_similar(applicant_id, data.desired_position):
                 raise ResumeAlreadyExists(data.desired_position)
 

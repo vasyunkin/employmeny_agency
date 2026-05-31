@@ -11,7 +11,7 @@ class ResumeCreateIn(BaseModel):
 
 
 class ResumeUpdateIn(BaseModel):
-    desired_position: Optional[str] = Field(None, min_length=5, max_length=255)
+    desired_position: Optional[str] = Field(None, min_length=3, max_length=255)
     desired_salary: Optional[float] = Field(None, ge=0)
     experience_years: Optional[int] = Field(None, ge=0)
     skills: Optional[str] = None

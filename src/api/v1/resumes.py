@@ -7,13 +7,14 @@ from src.service.resume.r_exceptions import ResumeAlreadyExists, ResumeNotFound,
 
 from src.api.dependencies import get_current_user
 
+
 router = APIRouter(
     prefix="/resumes",
     tags=["resumes"]
 )
 
 
-async def get_resume_service(request: Request) -> ResumeService:  # Request нужен для dishka
+async def get_resume_service(request: Request) -> ResumeService:
     container = request.state.dishka_container
     service = container.get(ResumeService)
 
