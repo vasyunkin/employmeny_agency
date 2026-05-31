@@ -7,8 +7,8 @@ from passlib.context import CryptContext
 
 from src.dal.facade import DALFacade
 from src.domain.user import User
-from .dto import RegisterIn, LoginIn, TokenOut
-from .exceptions import UserAlreadyExists, InvalidCredentials
+from .auth_dto import RegisterIn, LoginIn, TokenOut
+from .a_exceptions import UserAlreadyExists, InvalidCredentials
 from src.main.config import auth_config
 
 

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Request
 
 from src.service.auth.auth_service import AuthService
-from src.service.auth.dto import RegisterIn, LoginIn, TokenOut
-from src.service.auth.exceptions import UserAlreadyExists, InvalidCredentials
+from src.service.auth.auth_dto import RegisterIn, LoginIn, TokenOut
+from src.service.auth.a_exceptions import UserAlreadyExists, InvalidCredentials
 
 router = APIRouter(
     prefix="/auth",
