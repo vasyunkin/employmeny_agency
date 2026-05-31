@@ -1,17 +1,22 @@
 from datetime import datetime, timedelta
+import hashlib
 
 from dishka import FromDishka
 from jose import jwt
 from passlib.context import CryptContext
 
 from src.dal.facade import DALFacade
-from src.domain.user import User, UserRole
+from src.domain.user import User
 from .dto import RegisterIn, LoginIn, TokenOut
 from .exceptions import UserAlreadyExists, InvalidCredentials
 from src.main.config import auth_config
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(
+    schemes=["pbkdf2_sha256"],
+    deprecated="auto",
+    pbkdf2_sha256__default_rounds=100000
+)
 
 
 class AuthService:
