@@ -5,8 +5,6 @@
 import pytest
 
 from src.domain.notification import Notification
-from src.domain.user import UserRole
-
 
 class TestNotificationRepositoryCreate:
     """Тесты метода create."""

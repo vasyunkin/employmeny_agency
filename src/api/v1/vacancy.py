@@ -7,6 +7,7 @@ from src.service.vacancy.v_exceptions import VacancyNotFound, ForbiddenVacancyAc
 
 from src.api.dependencies import get_current_user
 
+
 router = APIRouter(
     prefix="/vacancies",
     tags=["vacancies"]

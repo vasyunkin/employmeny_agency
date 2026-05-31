@@ -75,7 +75,6 @@ class SqlAlchemyUnitOfWork(UnitOfWork):
 
 
     async def get_match_detail(self, match_id: int) -> Optional["Match"]:
-        """Возвращает Match с подгруженными Resume и Vacancy"""
         match = await self._match.get_by_id(match_id)
         if match:
             resume = await self.resume.get_by_id(match.resume_id)
