@@ -150,6 +150,17 @@ async def test_vacancy(facade, test_employer):
     )
     return await facade.uow.vacancy.create(vacancy)
 
+@pytest.fixture
+async def test_inactive_match(facade, test_resume, test_vacancy, test_recruiter):
+    """Тестовый неактивный мэтч"""
+    match = Match(
+        resume_id=test_resume.resume_id,
+        vacancy_id=test_vacancy.vacancy_id,
+        recruiter_id=test_recruiter.user_id,
+        is_active=False,
+    )
+    return await facade.uow.match.create(match)
+
 
 @pytest.fixture
 async def test_interview_setup(facade):

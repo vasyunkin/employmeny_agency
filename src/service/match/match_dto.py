@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field, ConfigDict
 
-from src.domain.match import MatchStatus
 from src.service.resume.resume_dto import ResumeOut
 from src.service.vacancy.vacancy_dto import VacancyOut
 
@@ -12,7 +11,7 @@ class MatchCreateIn(BaseModel):
 
 class MatchUpdateStatusIn(BaseModel):
     """Обновление статуса мэтча"""
-    match_status: MatchStatus
+    is_active: bool  # вместо match_status
 
 
 class MatchOut(BaseModel):
@@ -20,7 +19,7 @@ class MatchOut(BaseModel):
     resume_id: int
     vacancy_id: int
     recruiter_id: int
-    match_status: MatchStatus
+    is_active: bool
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -36,7 +35,7 @@ class MatchDetailOut(BaseModel):
     resume_id: int
     vacancy_id: int
     recruiter_id: int
-    match_status: MatchStatus
+    is_active: bool
 
     resume: ResumeOut
     vacancy: VacancyOut

@@ -1,7 +1,7 @@
 from dishka import FromDishka
 
 from src.dal.facade import DALFacade
-from src.domain.match import Match, MatchStatus
+from src.domain.match import Match  # MatchStatus больше не нужен
 from .match_dto import MatchCreateIn, MatchUpdateStatusIn, MatchOut, MatchDetailOut
 from .m_exceptions import MatchAlreadyExists, MatchNotFound, ForbiddenMatchAccess
 
@@ -20,6 +20,7 @@ class MatchService:
                 resume_id=data.resume_id,
                 vacancy_id=data.vacancy_id,
                 recruiter_id=recruiter_id,
+                is_active=True
             )
 
             created_match = await uow.match.create(match)
@@ -52,7 +53,7 @@ class MatchService:
         recruiter_id: int,
         data: MatchUpdateStatusIn
     ) -> MatchOut:
-        """Обновить статус мэтча"""
+        """Обновить статус мэтча (активен/неактивен)"""
         async with self.dal.uow as uow:
             match = await uow.match.get_by_id(match_id)
 
@@ -62,7 +63,7 @@ class MatchService:
             if match.recruiter_id != recruiter_id:
                 raise ForbiddenMatchAccess(match_id, recruiter_id)
 
-            match.match_status = data.match_status
+            match.is_active = data.is_active
 
             await uow.match.update(match)
             await uow.commit()

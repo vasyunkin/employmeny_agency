@@ -1,16 +1,7 @@
-from sqlalchemy import Table, Column, Integer, ForeignKey, UniqueConstraint
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import Table, Column, Integer, ForeignKey, UniqueConstraint, Boolean
 
-from src.domain.match import Match, MatchStatus
+from src.domain.match import Match  # MatchStatus больше не нужен
 from src.dal.tables.base import metadata, mapper_registry
-
-
-match_statuses_enum = ENUM(
-    MatchStatus,
-    name='match_statuses',
-    create_type=True,
-    values_callable=lambda obj: [e.value for e in obj]
-)
 
 
 matches_table = Table(
@@ -34,10 +25,10 @@ matches_table = Table(
         nullable=False
     ),
     Column(
-        'match_status',
-        match_statuses_enum,
+        'is_active',
+        Boolean,
         nullable=False,
-        server_default='created'
+        server_default='true'
     ),
     UniqueConstraint('resume_id', 'vacancy_id'),
 )

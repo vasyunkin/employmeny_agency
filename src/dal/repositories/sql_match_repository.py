@@ -4,7 +4,7 @@ from sqlalchemy import select, update, delete, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.dal.interfaces.match_repository import MatchRepository
-from src.domain.match import Match, MatchStatus
+from src.domain.match import Match  # MatchStatus больше не нужен
 
 
 class SqlMatchRepository(MatchRepository):
@@ -24,7 +24,7 @@ class SqlMatchRepository(MatchRepository):
                 resume_id=match.resume_id,
                 vacancy_id=match.vacancy_id,
                 recruiter_id=match.recruiter_id,
-                match_status=match.match_status
+                is_active=match.is_active
             )
         )
         await self._session.execute(stmt)
@@ -82,7 +82,7 @@ class SqlMatchRepository(MatchRepository):
     async def search(
         self,
         recruiter_id: Optional[int] = None,
-        status: Optional[MatchStatus] = None,
+        is_active: Optional[bool] = None,
         limit: int = 50,
         offset: int = 0
     ) -> list[Match]:
@@ -94,9 +94,9 @@ class SqlMatchRepository(MatchRepository):
                 Match.recruiter_id == recruiter_id
             )
 
-        if status is not None:
+        if is_active is not None:
             stmt = stmt.where(
-                Match.match_status == status
+                Match.is_active == is_active
             )
 
         stmt = stmt.limit(limit).offset(offset)

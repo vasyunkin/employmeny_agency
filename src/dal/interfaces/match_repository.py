@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Protocol, Optional
 
-from src.domain.match import Match, MatchStatus
+from src.domain.match import Match
 
 
 class MatchRepository(Protocol):
@@ -48,7 +48,7 @@ class MatchRepository(Protocol):
     async def search(
             self,
             recruiter_id: Optional[int] = None,
-            status: Optional[MatchStatus] = None,
+            is_active: Optional[bool] = None,
             limit: int = 50,
             offset: int = 0
     ) -> list[Match]:

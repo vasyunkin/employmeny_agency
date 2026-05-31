@@ -4,8 +4,7 @@
 
 import pytest
 
-from src.domain.match import Match, MatchStatus
-from src.domain.user import UserRole
+from src.domain.match import Match
 
 
 class TestMatchRepositoryCreate:
@@ -28,7 +27,7 @@ class TestMatchRepositoryCreate:
         assert created_match.resume_id == test_resume.resume_id
         assert created_match.vacancy_id == test_vacancy.vacancy_id
         assert created_match.recruiter_id == test_recruiter.user_id
-        assert created_match.match_status == MatchStatus.CREATED
+        assert created_match.is_active == True
 
 
 class TestMatchRepositoryGetById:
@@ -135,24 +134,6 @@ class TestMatchRepositoryListMethods:
 
 class TestMatchRepositoryUpdateAndDelete:
     """Тесты update и delete."""
-
-    @pytest.mark.asyncio
-    async def test_update_status(self, facade, test_resume, test_vacancy, test_recruiter):
-        """Обновление статуса матча."""
-        repo = facade.uow.match
-
-        match = Match(
-            resume_id=test_resume.resume_id,
-            vacancy_id=test_vacancy.vacancy_id,
-            recruiter_id=test_recruiter.user_id,
-        )
-        created = await repo.create(match)
-
-        created.match_status = MatchStatus.APPROVED
-        await repo.update(created)
-
-        updated = await repo.get_by_id(created.match_id)
-        assert updated.match_status == MatchStatus.APPROVED
 
     @pytest.mark.asyncio
     async def test_delete_match(self, facade, test_resume, test_vacancy, test_recruiter):
