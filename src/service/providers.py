@@ -4,6 +4,7 @@ from src.dal.facade import DALFacade
 from src.service.auth.auth_service import AuthService
 from src.service.resume.resume_service import ResumeService
 from src.service.vacancy.vacancy_service import VacancyService
+from src.service.match.match_service import MatchService
 
 
 class ServiceProvider(Provider):
@@ -19,3 +20,7 @@ class ServiceProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def vacancy_service(self, dal: DALFacade) -> VacancyService:
         return VacancyService(dal)
+
+    @provide(scope=Scope.REQUEST)
+    def match_service(self, dal: DALFacade) -> MatchService:
+        return MatchService(dal)

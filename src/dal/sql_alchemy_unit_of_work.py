@@ -1,3 +1,4 @@
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.dal.interfaces.unit_of_work import UnitOfWork
@@ -71,6 +72,21 @@ class SqlAlchemyUnitOfWork(UnitOfWork):
         if self._notification is None:
             self._notification = SqlNotificationRepository(self._session)
         return self._notification
+
+
+    async def get_match_detail(self, match_id: int) -> Optional["Match"]:
+        """Возвращает Match с подгруженными Resume и Vacancy"""
+        match = await self._match.get_by_id(match_id)
+        if match:
+            resume = await self.resume.get_by_id(match.resume_id)
+            vacancy = await self.vacancy.get_by_id(match.vacancy_id)
+
+            if resume:
+                match.resume = resume
+            if vacancy:
+                match.vacancy = vacancy
+
+        return match
 
 
     async def commit(self) -> None:
