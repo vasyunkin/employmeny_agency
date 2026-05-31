@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employ Agency — Вход и регистрация</title>
+    <link rel="stylesheet" href="/static/css/auth.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>Employ Agency</h1>
+                <p>Закрытое бюро по трудоустройству</p>
+            </div>
+
+            <!-- Переключатель с регистрацией справа -->
+            <div class="tabs">
+                <input type="radio" name="tab" id="tab-login" checked>
+                <input type="radio" name="tab" id="tab-register">
+
+                <label for="tab-register" class="tab-label register-tab">Регистрация</label>
+                <label for="tab-login" class="tab-label login-tab">Вход</label>
+
+                <!-- Форма входа -->
+                <div class="tab-content login-content">
+                    <form action="/auth/login" method="POST" autocomplete="off">
+                        <div class="input-group">
+                            <input type="text" name="user_login" required placeholder="Логин" autocomplete="off">
+                        </div>
+                        <div class="input-group">
+                            <input type="password" name="password" required placeholder="Пароль" autocomplete="new-password">
+                        </div>
+                        <button type="submit" class="btn login-btn">Войти</button>
+                    </form>
+                </div>
+
+                <!-- Форма регистрации -->
+                <div class="tab-content register-content">
+                    <form action="/auth/register" method="POST" autocomplete="off">
+                        <div class="input-group">
+                            <input type="text" name="user_login" required placeholder="Логин" autocomplete="off">
+                        </div>
+                        <div class="input-group">
+                            <input type="password" name="password" required placeholder="Пароль" autocomplete="new-password">
+                        </div>
+                        <div class="input-group">
+                            <input type="text" name="first_name" required placeholder="Имя" autocomplete="off">
+                        </div>
+                        <div class="input-group">
+                            <input type="text" name="last_name" required placeholder="Фамилия" autocomplete="off">
+                        </div>
+
+                        <div class="role-select">
+                            <label>
+                                <input type="radio" name="user_role" value="APPLICANT" checked>
+                                <span>🔍 Я ищу работу</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="user_role" value="EMPLOYER">
+                                <span>💼 Я даю работу</span>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn register-btn">Зарегистрироваться</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
