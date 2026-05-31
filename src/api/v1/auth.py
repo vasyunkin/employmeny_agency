@@ -1,5 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
-from dishka.integrations.fastapi import FromDishka, inject
+from fastapi import APIRouter, HTTPException, status, Depends, Request
 
 from src.service.auth.auth_service import AuthService
 from src.service.auth.dto import RegisterIn, LoginIn, TokenOut
@@ -11,11 +10,20 @@ router = APIRouter(
 )
 
 
+async def get_auth_service(request: Request) -> AuthService:
+    container = request.state.dishka_container
+    auth_service = container.get(AuthService)
+
+    if hasattr(auth_service, "__await__"):
+        return await auth_service
+
+    return auth_service
+
+
 @router.post("/register", response_model=TokenOut, status_code=status.HTTP_201_CREATED)
-@inject
 async def register(
     data: RegisterIn,
-    auth_service: FromDishka[AuthService]
+    auth_service: AuthService = Depends(get_auth_service),
 ):
     try:
         return await auth_service.register(data)
@@ -27,10 +35,9 @@ async def register(
 
 
 @router.post("/login", response_model=TokenOut)
-@inject
 async def login(
     data: LoginIn,
-    auth_service: FromDishka[AuthService]
+    auth_service: AuthService = Depends(get_auth_service),
 ):
     try:
         return await auth_service.login(data)
