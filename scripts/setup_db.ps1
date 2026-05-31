@@ -19,22 +19,18 @@ $env:POSTGRES_PORT = if ($env:POSTGRES_PORT) { $env:POSTGRES_PORT } else { "5432
 $env:POSTGRES_DATABASE = if ($env:POSTGRES_DATABASE) { $env:POSTGRES_DATABASE } else { "employment_agency" }
 
 # 1. Start main database
-Write-Host "[1/6] Starting PostgreSQL container..." -ForegroundColor Yellow
+Write-Host "[1/5] Starting PostgreSQL container..." -ForegroundColor Yellow
 docker compose up -d postgres
 
-Write-Host "[2/6] Waiting for database to be ready..." -ForegroundColor Yellow
+Write-Host "[2/5] Waiting for database to be ready..." -ForegroundColor Yellow
 Start-Sleep -Seconds 5
-
-# 2. Install Alembic and asyncpg
-Write-Host "[3/6] Installing Alembic and dependencies..." -ForegroundColor Yellow
-pip install alembic psycopg2-binary asyncpg
 
 # 3. Initialize Alembic
 if (-not (Test-Path "alembic")) {
-    Write-Host "[4/6] Initializing Alembic..." -ForegroundColor Yellow
+    Write-Host "[3/5] Initializing Alembic..." -ForegroundColor Yellow
     alembic init -t async alembic
 } else {
-    Write-Host "[4/6] Alembic already initialized, skipping..." -ForegroundColor Yellow
+    Write-Host "[3/5] Alembic already initialized, skipping..." -ForegroundColor Yellow
 }
 
 # Build the actual database URL for sync (for alembic.ini)
@@ -45,7 +41,7 @@ $databaseUrlAsync = "postgresql+asyncpg://${env:POSTGRES_USER}:${env:POSTGRES_PA
 Write-Host "Database URL: postgresql+psycopg2://${env:POSTGRES_USER}:***@${env:POSTGRES_HOST}:${env:POSTGRES_PORT}/${env:POSTGRES_DATABASE}" -ForegroundColor Gray
 
 # 4. Configure alembic.ini with sync URL
-Write-Host "[5/6] Configuring alembic.ini..." -ForegroundColor Yellow
+Write-Host "[4/5] Configuring alembic.ini..." -ForegroundColor Yellow
 $alembicIni = @"
 [alembic]
 script_location = alembic
@@ -89,7 +85,7 @@ datefmt = %H:%M:%S
 $alembicIni | Out-File -FilePath alembic.ini -Encoding ascii
 
 # 5. Configure alembic/env.py for async
-Write-Host "[6/6] Configuring alembic/env.py..." -ForegroundColor Yellow
+Write-Host "[5/5] Configuring alembic/env.py..." -ForegroundColor Yellow
 $envPy = @'
 import sys
 import os

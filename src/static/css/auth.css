@@ -1,0 +1,364 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1a1a2e;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 450px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 32px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.header {
+    text-align: center;
+    padding: 40px 30px 30px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: shimmer 10s infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% {
+        transform: translate(0, 0);
+    }
+    50% {
+        transform: translate(10%, 10%);
+    }
+}
+
+.header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    position: relative;
+    letter-spacing: -0.5px;
+}
+
+.header p {
+    opacity: 0.95;
+    font-size: 14px;
+    font-weight: 500;
+    position: relative;
+}
+
+/* Tabs - нормальный порядок, кнопки сверху */
+.tabs {
+    position: relative;
+    background: #f8f9fa;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.tab-label {
+    display: inline-block;
+    width: 50%;
+    padding: 18px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    background: transparent;
+    order: 1;
+}
+
+/* Регистрация справа */
+.register-tab {
+    order: 2;
+}
+
+.login-tab {
+    order: 1;
+}
+
+.login-tab {
+    color: #6c757d;
+}
+
+.register-tab {
+    color: #6c757d;
+}
+
+#tab-login:checked ~ .login-tab {
+    color: #28a745;
+    background: white;
+    border-bottom: 3px solid #28a745;
+}
+
+#tab-register:checked ~ .register-tab {
+    color: #fd7e14;
+    background: white;
+    border-bottom: 3px solid #fd7e14;
+}
+
+.tab-label::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+#tab-login:checked ~ .login-tab::after {
+    background: linear-gradient(90deg, #28a745, #20c997);
+}
+
+#tab-register:checked ~ .register-tab::after {
+    background: linear-gradient(90deg, #fd7e14, #ffc107);
+}
+
+/* Фиксированная высота для контента */
+.tab-content {
+    display: none;
+    padding: 35px 30px;
+    background: white;
+    min-height: 480px;
+    width: 100%;
+    order: 3;
+}
+
+#tab-login:checked ~ .login-content,
+#tab-register:checked ~ .register-content {
+    display: block;
+    animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Поля ввода */
+.input-group {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e9ecef;
+    border-radius: 16px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    font-family: inherit;
+}
+
+/* Убираем автоматическое заполнение браузера */
+.input-group input:-webkit-autofill,
+.input-group input:-webkit-autofill:hover,
+.input-group input:-webkit-autofill:focus,
+.input-group input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #f8f9fa inset !important;
+    box-shadow: 0 0 0 30px #f8f9fa inset !important;
+    -webkit-text-fill-color: #1a1a2e !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.input-group input::placeholder {
+    color: #adb5bd;
+    font-size: 14px;
+}
+
+/* Кнопки */
+.btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: 15px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.login-btn {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.login-btn:hover {
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+    transform: translateY(-2px);
+}
+
+.register-btn {
+    background: linear-gradient(135deg, #fd7e14, #ffc107);
+    color: white;
+    box-shadow: 0 4px 15px rgba(253, 126, 20, 0.3);
+}
+
+.register-btn:hover {
+    box-shadow: 0 6px 20px rgba(253, 126, 20, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Выбор роли - без радио-кружков */
+.role-select {
+    display: flex;
+    gap: 15px;
+    margin: 25px 0 15px;
+}
+
+.role-select label {
+    flex: 1;
+    padding: 14px;
+    border: 2px solid #e9ecef;
+    border-radius: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    font-weight: 500;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Скрываем радио-кнопки */
+.role-select input[type="radio"] {
+    display: none;
+}
+
+.role-select label:has(input[type="radio"]:checked) {
+    border-color: #667eea;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    transform: scale(1.02);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+.role-select span {
+    transition: all 0.3s ease;
+    position: relative;
+    padding-left: 0;
+}
+
+/* Убираем точки у radio */
+.role-select span::before {
+    display: none;
+}
+
+/* Дополнительные эффекты */
+::selection {
+    background: #667eea;
+    color: white;
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+
+    .header h1 {
+        font-size: 26px;
+    }
+
+    .tab-content {
+        padding: 25px 20px;
+        min-height: 520px;
+    }
+
+    .role-select {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 14px;
+    }
+}

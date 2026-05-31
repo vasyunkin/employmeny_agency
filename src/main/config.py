@@ -2,6 +2,7 @@ from pydantic import SecretStr, Field
 from pydantic_settings import BaseSettings as _BaseSettings
 from pydantic_settings import SettingsConfigDict
 from sqlalchemy import URL
+from pathlib import Path
 
 
 class BaseSettings(_BaseSettings):
