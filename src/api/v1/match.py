@@ -82,9 +82,9 @@ async def get_match_detail(
             recruiter_id=current_user.user_id
         )
     except MatchNotFound as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e))
     except ForbiddenMatchAccess as e:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+        raise HTTPException(status_code=403, detail=str(e))
 
 
 @router.patch("/{match_id}/status", response_model=MatchOut)
@@ -101,9 +101,9 @@ async def update_match_status(
             data=data
         )
     except MatchNotFound as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e))
     except ForbiddenMatchAccess as e:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+        raise HTTPException(status_code=403, detail=str(e))
 
 
 @router.patch("/{match_id}/acceptance", response_model=MatchOut)
@@ -113,7 +113,10 @@ async def update_match_acceptance(
     match_service: MatchService = Depends(get_match_service),
     current_user=Depends(get_current_user)
 ):
-    """Обновление статуса принятия мэтча (соискателем или работодателем)"""
+    """
+    Обновление статуса принятия мэтча.
+    Здесь автоматически триггерятся уведомления через service layer.
+    """
     try:
         return await match_service.update_acceptance(
             match_id=match_id,
@@ -121,9 +124,9 @@ async def update_match_acceptance(
             data=data
         )
     except MatchNotFound as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e))
     except ForbiddenMatchAccess as e:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+        raise HTTPException(status_code=403, detail=str(e))
 
 
 @router.delete("/{match_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -138,6 +141,6 @@ async def delete_match(
             recruiter_id=current_user.user_id
         )
     except MatchNotFound as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e))
     except ForbiddenMatchAccess as e:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+        raise HTTPException(status_code=403, detail=str(e))

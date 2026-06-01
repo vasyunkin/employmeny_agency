@@ -6,6 +6,7 @@ from src.service.resume.resume_service import ResumeService
 from src.service.vacancy.vacancy_service import VacancyService
 from src.service.match.match_service import MatchService
 from src.service.notification.notification_service import NotificationService
+from src.service.notification.notification_creator import NotificationCreator
 
 
 class ServiceProvider(Provider):
@@ -27,5 +28,9 @@ class ServiceProvider(Provider):
         return MatchService(dal)
 
     @provide(scope=Scope.REQUEST)
-    def match_service(self, dal: DALFacade) -> NotificationService:
+    def notification_service(self, dal: DALFacade) -> NotificationService:
         return NotificationService(dal)
+
+    @provide(scope=Scope.REQUEST)
+    def notification_creator(self, dal: DALFacade) -> NotificationCreator:
+        return NotificationCreator(dal)

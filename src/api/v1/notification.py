@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from typing import List
 
 from src.service.notification.notification_service import NotificationService
+from src.service.notification.notification_creator import NotificationCreator
+
 from src.service.notification.notification_dto import (
     NotificationOut,
 )
@@ -19,6 +21,10 @@ router = APIRouter(
 )
 
 
+# =========================
+# DEPENDENCIES
+# =========================
+
 async def get_notification_service(request: Request) -> NotificationService:
     container = request.state.dishka_container
     service = container.get(NotificationService)
@@ -27,6 +33,19 @@ async def get_notification_service(request: Request) -> NotificationService:
         return await service
     return service
 
+
+async def get_notification_creator(request: Request) -> NotificationCreator:
+    container = request.state.dishka_container
+    creator = container.get(NotificationCreator)
+
+    if hasattr(creator, "__await__"):
+        return await creator
+    return creator
+
+
+# =========================
+# CRUD
+# =========================
 
 @router.get("/", response_model=List[NotificationOut])
 async def list_notifications(
