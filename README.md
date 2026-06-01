@@ -50,6 +50,7 @@
 ЗАПУСК ТЕСТОВ:
 docker-compose up -d
 pytest tests/integration -q
+pytest tests/unit -q 
 
 2026.05.29 - 20:30 - 00:00 - переделал фасад, сделал пробный auth_service, шаблона для 
 api роутов под auth service. Теперь:
@@ -83,3 +84,4 @@ to-do:
 
 2026.06.01 - 12:00 - 12:35 - добавил accepted в таблицу matches
 2026.06.01 - 12:35 - 13:15 - подружил notifications и matches services, обновил под них api
+2026.06.01 - 13:45 - 14:10 - написал unit тесты для всех имеющихся сервисов
