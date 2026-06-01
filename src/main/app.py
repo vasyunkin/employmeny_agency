@@ -10,7 +10,7 @@ from src.api.v1.match import router as match_router
 from src.api.v1.notification import router as notification_router
 from src.main.ioc import setup_di
 
-templates = Jinja2Templates(directory="src/presentation")
+templates = Jinja2Templates(directory="src/presentation/templates")
 
 
 def create_app() -> FastAPI:
@@ -20,7 +20,7 @@ def create_app() -> FastAPI:
         redoc_url="/redoc"
     )
 
-    app.mount("/static", StaticFiles(directory="src/static"), name="static")
+    app.mount("/static", StaticFiles(directory="src/presentation/static"), name="static")
 
     @app.get("/", response_class=HTMLResponse)
     async def home(request: Request):
