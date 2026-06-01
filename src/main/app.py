@@ -28,6 +28,7 @@ def create_app() -> FastAPI:
         content = template.render({"request": request})
         return HTMLResponse(content)
 
+
     app.include_router(auth_router)
     app.include_router(resumes_router)
     app.include_router(vacancy_router)

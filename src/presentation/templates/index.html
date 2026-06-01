@@ -1,72 +1,117 @@
 <!DOCTYPE html>
-<html lang="ru">
+
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employ Agency — Вход и регистрация</title>
+    <title>Auth</title>
     <link rel="stylesheet" href="/static/css/auth.css">
 </head>
 <body>
-    <div class="container">
-        <div class="card">
-            <div class="header">
-                <h1>Employ Agency</h1>
-                <p>Закрытое бюро по трудоустройству</p>
-            </div>
 
-            <!-- Переключатель с регистрацией справа -->
-            <div class="tabs">
-                <input type="radio" name="tab" id="tab-login" checked>
-                <input type="radio" name="tab" id="tab-register">
-
-                <label for="tab-register" class="tab-label register-tab">Регистрация</label>
-                <label for="tab-login" class="tab-label login-tab">Вход</label>
-
-                <!-- Форма входа -->
-                <div class="tab-content login-content">
-                    <form action="/auth/login" method="POST" autocomplete="off">
-                        <div class="input-group">
-                            <input type="text" name="user_login" required placeholder="Логин" autocomplete="off">
-                        </div>
-                        <div class="input-group">
-                            <input type="password" name="password" required placeholder="Пароль" autocomplete="new-password">
-                        </div>
-                        <button type="submit" class="btn login-btn">Войти</button>
-                    </form>
-                </div>
-
-                <!-- Форма регистрации -->
-                <div class="tab-content register-content">
-                    <form action="/auth/register" method="POST" autocomplete="off">
-                        <div class="input-group">
-                            <input type="text" name="user_login" required placeholder="Логин" autocomplete="off">
-                        </div>
-                        <div class="input-group">
-                            <input type="password" name="password" required placeholder="Пароль" autocomplete="new-password">
-                        </div>
-                        <div class="input-group">
-                            <input type="text" name="first_name" required placeholder="Имя" autocomplete="off">
-                        </div>
-                        <div class="input-group">
-                            <input type="text" name="last_name" required placeholder="Фамилия" autocomplete="off">
-                        </div>
-
-                        <div class="role-select">
-                            <label>
-                                <input type="radio" name="user_role" value="APPLICANT" checked>
-                                <span>🔍 Я ищу работу</span>
-                            </label>
-                            <label>
-                                <input type="radio" name="user_role" value="EMPLOYER">
-                                <span>💼 Я даю работу</span>
-                            </label>
-                        </div>
-
-                        <button type="submit" class="btn register-btn">Зарегистрироваться</button>
-                    </form>
-                </div>
-            </div>
+<div class="container">
+    <div class="form-box">
+        <div class="toggle">
+            <button onclick="showLogin()">Вход</button>
+            <button onclick="showRegister()">Регистрация</button>
         </div>
-    </div>
+
+```
+    <form id="loginForm">
+        <h2>Login</h2>
+        <input type="text" id="login_login" placeholder="Логин" required>
+        <input type="password" id="login_password" placeholder="Пароль" required>
+        <button type="submit">Войти</button>
+        <p id="login_error" class="error"></p>
+    </form>
+
+    <form id="registerForm" style="display:none;">
+        <h2>Register</h2>
+        <input type="text" id="reg_login" placeholder="Логин" required>
+        <input type="password" id="reg_password" placeholder="Пароль" required>
+        <input type="text" id="first_name" placeholder="Имя" required>
+        <input type="text" id="last_name" placeholder="Фамилия" required>
+
+        <select id="role">
+            <option value="applicant">Соискатель</option>
+            <option value="employer">Работодатель</option>
+        </select>
+
+        <button type="submit">Регистрация</button>
+        <p id="register_error" class="error"></p>
+    </form>
+</div>
+```
+
+</div>
+
+<script>
+function showLogin() {
+    document.getElementById("loginForm").style.display = "block";
+    document.getElementById("registerForm").style.display = "none";
+}
+
+function showRegister() {
+    document.getElementById("loginForm").style.display = "none";
+    document.getElementById("registerForm").style.display = "block";
+}
+
+document.getElementById("loginForm").onsubmit = async (e) => {
+    e.preventDefault();
+
+    const res = await fetch("/auth/login", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            user_login: document.getElementById("login_login").value,
+            password: document.getElementById("login_password").value
+        })
+    });
+
+    if (!res.ok) {
+        document.getElementById("login_error").innerText = "Invalid credentials";
+        return;
+    }
+
+    const data = await res.json();
+    localStorage.setItem("token", data.access_token);
+
+    const payload = JSON.parse(atob(data.access_token.split('.')[1]));
+
+    if (payload.role === "applicant") {
+        window.location.href = "/resumes-page";
+    } else if (payload.role === "employer") {
+        window.location.href = "/vacancies-page";
+    } else {
+        window.location.href = "/matches-page";
+    }
+};
+
+document.getElementById("registerForm").onsubmit = async (e) => {
+    e.preventDefault();
+
+    const res = await fetch("/auth/register", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            user_login: document.getElementById("reg_login").value,
+            password: document.getElementById("reg_password").value,
+            first_name: document.getElementById("first_name").value,
+            last_name: document.getElementById("last_name").value,
+            user_role: document.getElementById("role").value
+        })
+    });
+
+    if (!res.ok) {
+        document.getElementById("register_error").innerText = "User already exists";
+        return;
+    }
+
+    const data = await res.json();
+    localStorage.setItem("token", data.access_token);
+
+    window.location.href = "/";
+};
+</script>
+
 </body>
 </html>
