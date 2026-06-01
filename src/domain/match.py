@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from enum import Enum
 from typing import Optional
 
 from src.domain.resume import Resume
@@ -13,6 +12,8 @@ class Match:
     recruiter_id: int
     match_id: Optional[int] = None
     is_active: bool = True
+    applicant_accepted: Optional[bool] = None
+    employer_accepted: Optional[bool] = None
 
     resume: Optional[Resume] = None
     vacancy: Optional[Vacancy] = None

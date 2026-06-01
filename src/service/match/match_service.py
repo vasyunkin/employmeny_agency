@@ -1,8 +1,8 @@
 from dishka import FromDishka
 
 from src.dal.facade import DALFacade
-from src.domain.match import Match  # MatchStatus больше не нужен
-from .match_dto import MatchCreateIn, MatchUpdateStatusIn, MatchOut, MatchDetailOut
+from src.domain.match import Match
+from .match_dto import MatchCreateIn, MatchUpdateStatusIn, MatchOut, MatchDetailOut, MatchUpdateAcceptanceIn
 from .m_exceptions import MatchAlreadyExists, MatchNotFound, ForbiddenMatchAccess
 
 
@@ -20,7 +20,9 @@ class MatchService:
                 resume_id=data.resume_id,
                 vacancy_id=data.vacancy_id,
                 recruiter_id=recruiter_id,
-                is_active=True
+                is_active=True,
+                applicant_accepted=None,
+                employer_accepted=None
             )
 
             created_match = await uow.match.create(match)
@@ -64,6 +66,33 @@ class MatchService:
                 raise ForbiddenMatchAccess(match_id, recruiter_id)
 
             match.is_active = data.is_active
+
+            await uow.match.update(match)
+            await uow.commit()
+
+            return MatchOut.model_validate(match)
+
+    async def update_acceptance(
+            self,
+            match_id: int,
+            recruiter_id: int,
+            data: MatchUpdateAcceptanceIn
+    ) -> MatchOut:
+        """Обновить статус принятия мэтча (соискателем или работодателем)"""
+        async with self.dal.uow as uow:
+            match = await uow.match.get_by_id(match_id)
+
+            if not match:
+                raise MatchNotFound(match_id)
+
+            if match.recruiter_id != recruiter_id:
+                raise ForbiddenMatchAccess(match_id, recruiter_id)
+
+            if data.applicant_accepted is not None:
+                match.applicant_accepted = data.applicant_accepted
+
+            if data.employer_accepted is not None:
+                match.employer_accepted = data.employer_accepted
 
             await uow.match.update(match)
             await uow.commit()

@@ -1,6 +1,5 @@
 from sqlalchemy import Table, Column, Integer, ForeignKey, UniqueConstraint, Boolean
-
-from src.domain.match import Match  # MatchStatus больше не нужен
+from src.domain.match import Match
 from src.dal.tables.base import metadata, mapper_registry
 
 
@@ -29,6 +28,18 @@ matches_table = Table(
         Boolean,
         nullable=False,
         server_default='true'
+    ),
+    Column(
+        'applicant_accepted',
+        Boolean,
+        nullable=True,
+        server_default=None
+    ),
+    Column(
+        'employer_accepted',
+        Boolean,
+        nullable=True,
+        server_default=None
     ),
     UniqueConstraint('resume_id', 'vacancy_id'),
 )

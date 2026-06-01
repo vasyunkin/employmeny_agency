@@ -24,7 +24,9 @@ class SqlMatchRepository(MatchRepository):
                 resume_id=match.resume_id,
                 vacancy_id=match.vacancy_id,
                 recruiter_id=match.recruiter_id,
-                is_active=match.is_active
+                is_active=match.is_active,
+                applicant_accepted=match.applicant_accepted,
+                employer_accepted=match.employer_accepted
             )
         )
         await self._session.execute(stmt)

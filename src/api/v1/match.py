@@ -5,6 +5,7 @@ from src.service.match.match_service import MatchService
 from src.service.match.match_dto import (
     MatchCreateIn,
     MatchUpdateStatusIn,
+    MatchUpdateAcceptanceIn,
     MatchOut,
     MatchDetailOut
 )
@@ -95,6 +96,26 @@ async def update_match_status(
 ):
     try:
         return await match_service.update_status(
+            match_id=match_id,
+            recruiter_id=current_user.user_id,
+            data=data
+        )
+    except MatchNotFound as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except ForbiddenMatchAccess as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+
+
+@router.patch("/{match_id}/acceptance", response_model=MatchOut)
+async def update_match_acceptance(
+    match_id: int,
+    data: MatchUpdateAcceptanceIn,
+    match_service: MatchService = Depends(get_match_service),
+    current_user=Depends(get_current_user)
+):
+    """Обновление статуса принятия мэтча (соискателем или работодателем)"""
+    try:
+        return await match_service.update_acceptance(
             match_id=match_id,
             recruiter_id=current_user.user_id,
             data=data
