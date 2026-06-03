@@ -186,10 +186,21 @@ alembic upgrade head
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "Migrations applied successfully!" -ForegroundColor Green
+} else {
+    Write-Host "Failed to apply migrations!" -ForegroundColor Red
+    exit 1
+}
+
+# 7. Seed initial data (NEW)
+Write-Host "[7/5] Seeding initial database data..." -ForegroundColor Yellow
+python ./scripts/seed_db.py
+
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "Database seeding completed successfully!" -ForegroundColor Green
     Write-Host ""
     Write-Host "=== Database Setup Completed Successfully! ===" -ForegroundColor Green
     Write-Host "You can now run the application."
 } else {
-    Write-Host "Failed to apply migrations!" -ForegroundColor Red
+    Write-Host "Failed to seed database!" -ForegroundColor Red
     exit 1
 }
