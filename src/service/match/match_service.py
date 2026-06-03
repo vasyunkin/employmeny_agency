@@ -41,13 +41,25 @@ class MatchService:
             )
 
             created_match = await uow.match.create(match)
-            detailed_match = await uow.get_match_detail(created_match.match_id)
-
-            if detailed_match.resume_id is not None and detailed_match.vacancy_id is not None:
-                await self.notification_creator.on_match_created(uow, detailed_match)
 
             await uow.commit()
             return MatchOut.model_validate(created_match)
+
+    async def notify(self, match_id: int, recruiter_id: int):
+        async with self.dal.uow as uow:
+            match = await uow.get_match_detail(match_id)
+
+            if not match:
+                raise MatchNotFound(match_id)
+
+            if match.recruiter_id != recruiter_id:
+                raise ForbiddenMatchAccess(match_id, recruiter_id)
+
+            if match.resume_id is None or match.vacancy_id is None:
+                raise ValueError("Match is incomplete")
+
+            await self.notification_creator.on_match_created(uow, match)
+            await uow.commit()
 
     async def get_by_id(self, match_id: int, recruiter_id: int) -> MatchDetailOut:
         async with self.dal.uow as uow:

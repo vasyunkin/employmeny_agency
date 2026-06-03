@@ -57,7 +57,7 @@ def create_app() -> FastAPI:
 
     @app.get("/matches/{match_id}", response_class=HTMLResponse)
     async def match_detail_page(request: Request):
-        template = templates.env.get_template("entity_detail.html")
+        template = templates.env.get_template("match_detail.html")
         return HTMLResponse(template.render({"request": request}))
 
 

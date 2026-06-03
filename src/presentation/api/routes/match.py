@@ -87,6 +87,16 @@ async def get_match_detail(
         raise HTTPException(status_code=403, detail=str(e))
 
 
+@router.post("/{match_id}/notify")
+async def notify_match(
+    match_id: int,
+    match_service: MatchService = Depends(get_match_service),
+    current_user=Depends(get_current_user)
+):
+    await match_service.notify(match_id, current_user.user_id)
+    return {"status": "ok"}
+
+
 @router.patch("/{match_id}/status", response_model=MatchOut)
 async def update_match_status(
     match_id: int,

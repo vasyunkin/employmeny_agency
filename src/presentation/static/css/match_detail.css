@@ -1,0 +1,17 @@
+.match-card {
+    background-color: #211e1b;
+    border: 1px solid #332e29;
+    border-radius: 16px;
+    padding: 25px;
+    height: 100%;
+}
+
+h2 {
+    color: #ffb07c;
+}
+
+.badge {
+    font-size: 14px;
+    padding: 8px 14px;
+    border-radius: 10px;
+}

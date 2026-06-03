@@ -1,0 +1,118 @@
+{% extends "layout.html" %}
+
+{% block title %}Сопоставление{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/match_detail.css">
+{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+
+    <h2 class="fw-bold mb-4">Сопоставление</h2>
+
+    <div id="matchContainer" class="match-container"></div>
+
+    <div class="text-center mt-4">
+        <button class="btn btn-success px-4" onclick="notifySides()">
+            Уведомить стороны
+        </button>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const matchId = window.location.pathname.split("/").pop();
+
+async function loadMatch() {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`/matches/${matchId}`, {
+        headers: { "Authorization": "Bearer " + token }
+    });
+
+    if (!res.ok) {
+        alert("Ошибка загрузки сопоставления");
+        return;
+    }
+
+    const match = await res.json();
+    renderMatch(match);
+}
+
+function renderMatch(match) {
+    const container = document.getElementById("matchContainer");
+
+    container.innerHTML = `
+        <div class="row g-4">
+
+            <div class="col-md-6">
+                <div class="match-card">
+                    <h5 class="fw-bold mb-3">Резюме</h5>
+                    ${renderResume(match.resume)}
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="match-card">
+                    <h5 class="fw-bold mb-3">Вакансия</h5>
+                    ${renderVacancy(match.vacancy)}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-4 text-center">
+            <span class="badge ${match.is_active ? 'bg-success' : 'bg-secondary'}">
+                ${match.is_active ? 'Активно' : 'Завершено'}
+            </span>
+        </div>
+    `;
+}
+
+function renderResume(r) {
+    return `
+        <p><b>${r.desired_position}</b></p>
+        <p>💰 ${r.desired_salary ?? "не указана"}</p>
+        <p>📊 ${r.experience_years} лет</p>
+        <p>🧠 ${r.skills ?? "-"}</p>
+        <p>🎓 ${r.education ?? "-"}</p>
+    `;
+}
+
+function renderVacancy(v) {
+    return `
+        <p><b>${v.title}</b></p>
+        <p>💰 ${v.salary ?? "не указана"}</p>
+        <p>📋 ${v.requirements ?? "-"}</p>
+        <p>🛠 ${v.responsibilities ?? "-"}</p>
+    `;
+}
+
+// ==========================
+// УВЕДОМЛЕНИЕ СТОРОН
+// ==========================
+
+async function notifySides() {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`/matches/${matchId}/notify`, {
+        method: "POST",
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    });
+
+    if (res.ok) {
+        alert("Уведомления отправлены");
+    } else {
+        const err = await res.json();
+        alert(err.detail || "Ошибка уведомления");
+    }
+}
+
+document.addEventListener("DOMContentLoaded", loadMatch);
+</script>
+{% endblock %}
