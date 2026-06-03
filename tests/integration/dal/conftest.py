@@ -1,12 +1,12 @@
 import pytest
+import os
+from dotenv import load_dotenv
+from datetime import datetime, timedelta
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
     AsyncSession,
     async_sessionmaker,
 )
-
-from datetime import datetime, timedelta
-
 
 from src.domain.user import User, UserRole
 from src.domain.resume import Resume
@@ -21,9 +21,16 @@ from src.dal.tables.map import map_tables
 from src.dal.facade import DALFacade
 
 
-TEST_DATABASE_URL = (
-    "postgresql+asyncpg://postgres:postgres@localhost:5437/employment_test_db"
-)
+load_dotenv()
+
+DB_USER = os.getenv("POSTGRES_USER", "postgres")
+DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "postgres")
+DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
+
+DB_PORT = "5437"
+DB_NAME = f"{os.getenv('POSTGRES_DATABASE', 'employment_agency')}_test"
+
+TEST_DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 
 @pytest.fixture(scope="session")
