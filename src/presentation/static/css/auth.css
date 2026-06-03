@@ -1,42 +1,87 @@
+/* Основные настройки страницы */
 body {
-font-family: Arial;
-background: #f4f6f8;
+    background-color: #171513; /* Теплый, глубокий древесно-угольный фон (без синевы) */
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: #fcfaf7; /* Чуть смягченный белый, ближе к молочному */
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.container {
-width: 100%;
-display: flex;
-justify-content: center;
-margin-top: 100px;
+.auth-container {
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
 }
 
+/* Карточка формы */
 .form-box {
-background: white;
-padding: 30px;
-border-radius: 10px;
-width: 300px;
+    background-color: #211e1b; /* Теплый темно-кофейный графит */
+    border: 1px solid #332e29; /* Мягкая теплая граница */
+    border-radius: 16px;
+    padding: 40px 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
-input, select {
-width: 100%;
-margin: 10px 0;
-padding: 8px;
+/* Переключатель вкладок */
+.toggle-btn {
+    background: transparent;
+    border: none;
+    color: #8c827a; /* Приглушенный теплый серый */
+    font-weight: 600;
+    padding-bottom: 8px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
 }
 
-button {
-width: 100%;
-padding: 10px;
-background: #2c7be5;
-color: white;
-border: none;
+.toggle-btn.active {
+    color: #ffb07c; /* Пастельно-оранжевый акцент */
+    border-bottom-color: #ffb07c;
 }
 
-.toggle {
-display: flex;
-justify-content: space-between;
-margin-bottom: 15px;
+/* Поля ввода и селекты */
+.form-control, .form-select {
+    background-color: #2c2724 !important; /* Теплый темный фон для инпутов */
+    border: 1px solid #423b36 !important;
+    color: #fff !important;
+    border-radius: 10px !important;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
 }
 
-.error {
-color: red;
+.form-control::placeholder {
+    color: #8c827a;
+}
+
+/* Фокус на полях ввода с мягким оранжевым свечением */
+.form-control:focus, .form-select:focus {
+    border-color: #ffb07c !important;
+    box-shadow: 0 0 0 3px rgba(255, 176, 124, 0.15) !important;
+}
+
+/* Оранжевая кнопка с мягким градиентом */
+.btn-custom {
+    background: linear-gradient(135deg, #ffb07c 0%, #ff944d 100%);
+    border: none;
+    color: #171513; /* Темный текст в цвет общего фона страницы */
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 12px;
+    transition: all 0.3s ease;
+}
+
+.btn-custom:hover {
+    opacity: 0.95;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(255, 148, 77, 0.3);
+}
+
+/* Блок для ошибок */
+.error-message {
+    font-size: 0.875rem;
+    color: #ff7676; /* Чуть более теплый оттенок красного */
+    margin-top: 10px;
+    text-align: center;
+    min-height: 21px;
 }

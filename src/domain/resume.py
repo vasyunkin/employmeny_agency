@@ -16,4 +16,4 @@ class Resume:
 
     def __post_init__(self):
         if not self.desired_position:
-            raise ValueError('Опа! Ошибка: desired_position не может быть пустой')
+            raise ValueError('Ошибка: desired_position не может быть пустой')

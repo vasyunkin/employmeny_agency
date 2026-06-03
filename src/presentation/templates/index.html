@@ -1,62 +1,81 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Auth</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="/static/css/auth.css">
 </head>
 <body>
 
-<div class="container">
+<div class="auth-container">
     <div class="form-box">
-        <div class="toggle">
-            <button onclick="showLogin()">Вход</button>
-            <button onclick="showRegister()">Регистрация</button>
+
+        <div class="d-flex justify-content-around mb-4">
+            <button id="btnToggleLogin" class="toggle-btn active" onclick="showLogin()">Вход</button>
+            <button id="btnToggleRegister" class="toggle-btn" onclick="showRegister()">Регистрация</button>
         </div>
 
-```
-    <form id="loginForm">
-        <h2>Login</h2>
-        <input type="text" id="login_login" placeholder="Логин" required>
-        <input type="password" id="login_password" placeholder="Пароль" required>
-        <button type="submit">Войти</button>
-        <p id="login_error" class="error"></p>
-    </form>
+        <form id="loginForm">
+            <h3 class="text-center mb-4 fw-bold">Войти в аккаунт</h3>
+            <div class="mb-3">
+                <input type="text" class="form-control" id="login_login" placeholder="Логин" required>
+            </div>
+            <div class="mb-4">
+                <input type="password" class="form-control" id="login_password" placeholder="Пароль" required>
+            </div>
+            <button type="submit" class="btn btn-custom w-100">Войти</button>
+            <p id="login_error" class="error-message"></p>
+        </form>
 
-    <form id="registerForm" style="display:none;">
-        <h2>Register</h2>
-        <input type="text" id="reg_login" placeholder="Логин" required>
-        <input type="password" id="reg_password" placeholder="Пароль" required>
-        <input type="text" id="first_name" placeholder="Имя" required>
-        <input type="text" id="last_name" placeholder="Фамилия" required>
+        <form id="registerForm" style="display:none;">
+            <h3 class="text-center mb-4 fw-bold">Создать аккаунт</h3>
+            <div class="mb-3">
+                <input type="text" class="form-control" id="reg_login" placeholder="Логин" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" class="form-control" id="reg_password" placeholder="Пароль" required>
+            </div>
+            <div class="mb-3">
+                <input type="text" class="form-control" id="first_name" placeholder="Имя" required>
+            </div>
+            <div class="mb-3">
+                <input type="text" class="form-control" id="last_name" placeholder="Фамилия" required>
+            </div>
+            <div class="mb-4">
+                <select class="form-select" id="role">
+                    <option value="applicant">Соискатель</option>
+                    <option value="employer">Работодатель</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-custom w-100">Зарегистрироваться</button>
+            <p id="register_error" class="error-message"></p>
+        </form>
 
-        <select id="role">
-            <option value="applicant">Соискатель</option>
-            <option value="employer">Работодатель</option>
-        </select>
-
-        <button type="submit">Регистрация</button>
-        <p id="register_error" class="error"></p>
-    </form>
-</div>
-```
-
+    </div>
 </div>
 
 <script>
 function showLogin() {
     document.getElementById("loginForm").style.display = "block";
     document.getElementById("registerForm").style.display = "none";
+    document.getElementById("btnToggleLogin").classList.add("active");
+    document.getElementById("btnToggleRegister").classList.remove("active");
 }
 
 function showRegister() {
     document.getElementById("loginForm").style.display = "none";
     document.getElementById("registerForm").style.display = "block";
+    document.getElementById("btnToggleLogin").classList.remove("active");
+    document.getElementById("btnToggleRegister").classList.add("active");
 }
 
 document.getElementById("loginForm").onsubmit = async (e) => {
     e.preventDefault();
+    document.getElementById("login_error").innerText = "";
 
     const res = await fetch("/auth/login", {
         method: "POST",
@@ -68,7 +87,7 @@ document.getElementById("loginForm").onsubmit = async (e) => {
     });
 
     if (!res.ok) {
-        document.getElementById("login_error").innerText = "Invalid credentials";
+        document.getElementById("login_error").innerText = "Неверный логин или пароль";
         return;
     }
 
@@ -88,6 +107,7 @@ document.getElementById("loginForm").onsubmit = async (e) => {
 
 document.getElementById("registerForm").onsubmit = async (e) => {
     e.preventDefault();
+    document.getElementById("register_error").innerText = "";
 
     const res = await fetch("/auth/register", {
         method: "POST",
@@ -102,7 +122,7 @@ document.getElementById("registerForm").onsubmit = async (e) => {
     });
 
     if (!res.ok) {
-        document.getElementById("register_error").innerText = "User already exists";
+        document.getElementById("register_error").innerText = "Пользователь с таким логином уже существует";
         return;
     }
 
