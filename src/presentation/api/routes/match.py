@@ -77,9 +77,10 @@ async def get_match_detail(
     current_user=Depends(get_current_user)
 ):
     try:
+        # ИСПРАВЛЕНО: передаем current_user_id вместо recruiter_id
         return await match_service.get_by_id(
             match_id=match_id,
-            recruiter_id=current_user.user_id
+            current_user_id=current_user.user_id
         )
     except MatchNotFound as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -130,7 +131,7 @@ async def update_match_acceptance(
     try:
         return await match_service.update_acceptance(
             match_id=match_id,
-            recruiter_id=current_user.user_id,
+            current_user_id=current_user.user_id,
             data=data
         )
     except MatchNotFound as e:

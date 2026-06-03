@@ -11,16 +11,12 @@
 
     <div class="mb-4 d-flex justify-content-between align-items-center">
         <h2 class="fw-bold m-0" style="color: #ffb07c;">Сопоставление</h2>
-        <button class="btn btn-outline-custom" onclick="location.href='/matches'">← К списку сопоставлений</button>
+        <button class="btn btn-outline-custom" onclick="goBack()">← Назад</button>
     </div>
 
     <div id="matchContainer" class="match-container"></div>
 
-    <div class="text-center mt-4">
-        <button class="btn btn-custom px-4" onclick="notifySides()">
-            🚀 Уведомить стороны
-        </button>
-    </div>
+    <div id="actionButtonsContainer" class="text-center mt-4"></div>
 
 </div>
 {% endblock %}
@@ -28,24 +24,48 @@
 {% block extra_js %}
 <script>
 const matchId = window.location.pathname.split("/").pop();
+let currentUser = null;
+
+// Парсим JWT-токен прямо на клиенте для определения ID и роли
+function parseJwt(token) {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    } catch (e) {
+        return null;
+    }
+}
 
 async function loadMatch() {
     const token = localStorage.getItem("token");
 
-    if (!token) window.location.href = "/";
+    if (!token) {
+        window.location.href = "/";
+        return;
+    }
 
-    // ИСПРАВЛЕНО: Добавлен префикс /api
+    const payload = parseJwt(token);
+    currentUser = {
+        id: payload?.user_id || payload?.sub,
+        role: payload?.role || payload?.user_role?.value || payload?.user_role
+    };
+
     const res = await fetch(`/api/matches/${matchId}`, {
         headers: { "Authorization": "Bearer " + token }
     });
 
     if (!res.ok) {
-        alert("Ошибка загрузки сопоставления");
+        alert("Ошибка загрузки сопоставления или у вас нет прав доступа.");
         return;
     }
 
     const match = await res.json();
     renderMatch(match);
+    renderActions(match);
 }
 
 function renderMatch(match) {
@@ -56,14 +76,28 @@ function renderMatch(match) {
 
             <div class="col-md-6">
                 <div class="match-card h-100">
-                    <h5 class="fw-bold mb-3" style="color: #ffb07c;">📄 Резюме</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold m-0" style="color: #ffb07c;">📄 Резюме</h5>
+                        ${match.applicant_accepted !== null ?
+                            `<span class="badge ${match.applicant_accepted ? 'bg-success' : 'bg-danger'}">
+                                ${match.applicant_accepted ? 'Откликнулся' : 'Отказ'}
+                            </span>` : ''
+                        }
+                    </div>
                     ${match.resume ? renderResume(match.resume) : "<p class='text-muted'>Не выбрано</p>"}
                 </div>
             </div>
 
             <div class="col-md-6">
                 <div class="match-card h-100">
-                    <h5 class="fw-bold mb-3" style="color: #ffb07c;">🏢 Вакансия</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold m-0" style="color: #ffb07c;">🏢 Вакансия</h5>
+                        ${match.employer_accepted !== null ?
+                            `<span class="badge ${match.employer_accepted ? 'bg-success' : 'bg-danger'}">
+                                ${match.employer_accepted ? 'Принято' : 'Отказ'}
+                            </span>` : ''
+                        }
+                    </div>
                     ${match.vacancy ? renderVacancy(match.vacancy) : "<p class='text-muted'>Не выбрано</p>"}
                 </div>
             </div>
@@ -101,19 +135,77 @@ function renderVacancy(v) {
     `;
 }
 
-// ==========================
-// УВЕДОМЛЕНИЕ СТОРОН
-// ==========================
+function renderActions(match) {
+    const btnContainer = document.getElementById("actionButtonsContainer");
+    btnContainer.innerHTML = "";
+
+    if (!match.is_active) {
+        btnContainer.innerHTML = `<p class="text-muted">Это сопоставление закрыто.</p>`;
+        return;
+    }
+
+    // Кнопки для РЕКРУТЕРА
+    if (currentUser.role === "recruiter") {
+        btnContainer.innerHTML = `
+            <button class="btn btn-custom px-4" onclick="notifySides()">
+                🚀 Уведомить стороны
+            </button>
+        `;
+    }
+    // Кнопки для СОИСКАТЕЛЯ (Кандидата)
+    else if (match.resume && match.resume.user_id == currentUser.id) {
+        if (match.applicant_accepted !== null) {
+            btnContainer.innerHTML = `<p class="text-muted">Вы уже оставили свой ответ.</p>`;
+            return;
+        }
+        btnContainer.innerHTML = `
+            <button class="btn btn-success px-4 me-2" onclick="handleDecision(true, null)">👍 Откликнуться</button>
+            <button class="btn btn-danger px-4" onclick="handleDecision(false, null)">👎 Отказаться</button>
+        `;
+    }
+    // Кнопки для РАБОТОДАТЕЛЯ
+    else if (match.vacancy && match.vacancy.employer_id == currentUser.id) {
+        if (match.employer_accepted !== null) {
+            btnContainer.innerHTML = `<p class="text-muted">Вы уже оставили свой ответ.</p>`;
+            return;
+        }
+        btnContainer.innerHTML = `
+            <button class="btn btn-success px-4 me-2" onclick="handleDecision(null, true)">✅ Принять</button>
+            <button class="btn btn-danger px-4" onclick="handleDecision(null, false)">❌ Отказать</button>
+        `;
+    }
+}
+
+async function handleDecision(applicantAccepted, employerAccepted) {
+    const token = localStorage.getItem("token");
+
+    let body = {};
+    if (applicantAccepted !== null) body.applicant_accepted = applicantAccepted;
+    if (employerAccepted !== null) body.employer_accepted = employerAccepted;
+
+    const res = await fetch(`/api/matches/${matchId}/acceptance`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify(body)
+    });
+
+    if (res.ok) {
+        alert("Ваше решение сохранено!");
+        loadMatch();
+    } else {
+        alert("Не удалось сохранить решение.");
+    }
+}
 
 async function notifySides() {
     const token = localStorage.getItem("token");
 
-    // ИСПРАВЛЕНО: Добавлен префикс /api
     const res = await fetch(`/api/matches/${matchId}/notify`, {
         method: "POST",
-        headers: {
-            "Authorization": "Bearer " + token
-        }
+        headers: { "Authorization": "Bearer " + token }
     });
 
     if (res.ok) {
@@ -121,6 +213,14 @@ async function notifySides() {
     } else {
         const err = await res.json();
         alert(err.detail || "Ошибка уведомления");
+    }
+}
+
+function goBack() {
+    if (currentUser && currentUser.role === "recruiter") {
+        window.location.href = "/matches";
+    } else {
+        window.location.href = "/";
     }
 }
 
