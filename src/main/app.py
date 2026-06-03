@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 
 from src.presentation.api.routes.auth import router as auth_router
-from src.presentation.api.routes.resumes import router as resumes_router
+from src.presentation.api.routes.resume import router as resumes_router
 from src.presentation.api.routes.vacancy import router as vacancy_router
 from src.presentation.api.routes.match import router as match_router
 from src.presentation.api.routes.notification import router as notification_router

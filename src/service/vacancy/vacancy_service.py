@@ -1,3 +1,4 @@
+from typing import Optional
 from dishka import FromDishka
 
 from src.dal.facade import DALFacade
@@ -54,3 +55,21 @@ class VacancyService:
 
             await uow.vacancy.deactivate(vacancy_id)
             await uow.commit()
+
+    async def search(
+            self,
+            title: Optional[str] = None,
+            min_salary: Optional[float] = None,
+            is_active: bool = True,
+            limit: int = 15,
+            offset: int = 0
+    ) -> list[VacancyOut]:
+        async with self.dal.uow as uow:
+            vacancies = await uow.vacancy.search(
+                title=title,
+                min_salary=min_salary,
+                is_active=is_active,
+                limit=limit,
+                offset=offset,
+            )
+            return [VacancyOut.model_validate(v) for v in vacancies]

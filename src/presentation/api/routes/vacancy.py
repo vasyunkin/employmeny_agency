@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Request
-from typing import List
+from typing import List, Optional
 
 from src.service.vacancy.vacancy_service import VacancyService
 from src.service.vacancy.vacancy_dto import VacancyCreateIn, VacancyOut
@@ -53,6 +53,24 @@ async def list_my_vacancies(
         )
 
     return await vacancy_service.list_by_employer(current_user.user_id)
+
+
+@router.get("/search/", response_model=List[VacancyOut])
+async def search_vacancies(
+        title: Optional[str] = None,
+        min_salary: Optional[float] = None,
+        is_active: bool = True,
+        limit: int = 15,
+        offset: int = 0,
+        vacancy_service: VacancyService = Depends(get_vacancy_service),
+):
+    return await vacancy_service.search(
+        title=title,
+        min_salary=min_salary,
+        is_active=is_active,
+        limit=limit,
+        offset=offset,
+    )
 
 
 @router.get("/{vacancy_id}", response_model=VacancyOut)

@@ -1,3 +1,4 @@
+from typing import Optional
 from dishka import FromDishka
 
 from src.dal.facade import DALFacade
@@ -63,27 +64,20 @@ class ResumeService:
             await uow.resume.deactivate(resume_id)
             await uow.commit()
 
-    # Опционально: обновление резюме
-    async def update(
-        self,
-        resume_id: int,
-        applicant_id: int,
-        data: ResumeUpdateIn
-    ) -> ResumeOut:
-        """Обновление резюме"""
+    async def search(
+            self,
+            desired_position: Optional[str] = None,
+            min_experience: Optional[int] = None,
+            is_active: bool = True,
+            limit: int = 15,
+            offset: int = 0
+    ) -> list[ResumeOut]:
         async with self.dal.uow as uow:
-            resume = await uow.resume.get_by_id(resume_id)
-
-            if not resume:
-                raise ResumeNotFound(resume_id)
-
-            if resume.applicant_id != applicant_id:
-                raise ForbiddenResumeAccess(resume_id, applicant_id)
-
-            for field, value in data.model_dump(exclude_unset=True).items():
-                setattr(resume, field, value)
-
-            await uow.commit()
-            await uow.session.refresh(resume)
-
-            return ResumeOut.model_validate(resume)
+            resumes = await uow.resume.search(
+                desired_position=desired_position,
+                min_experience=min_experience,
+                is_active=is_active,
+                limit=limit,
+                offset=offset,
+            )
+            return [ResumeOut.model_validate(r) for r in resumes]

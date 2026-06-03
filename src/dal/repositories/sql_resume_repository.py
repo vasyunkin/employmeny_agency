@@ -51,8 +51,8 @@ class SqlResumeRepository(ResumeRepository):
             self,
             desired_position: Optional[str] = None,
             min_experience: Optional[int] = None,
-            is_active: Optional[bool] = True,
-            limit: int = 10,
+            is_active: bool = True,
+            limit: int = 15,
             offset: int = 0
     ) -> list[Resume]:
 
@@ -68,13 +68,9 @@ class SqlResumeRepository(ResumeRepository):
                 Resume.experience_years >= min_experience
             )
 
-        if is_active is not True:
-            stmt = stmt.where(
-                Resume.is_active == is_active
-            )
+        stmt = stmt.where(Resume.is_active == is_active)
 
         stmt = stmt.limit(limit).offset(offset)
-
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 

@@ -1,12 +1,12 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Request
-from typing import List
+from typing import List, Optional
 
 from src.service.resume.resume_service import ResumeService
 from src.service.resume.resume_dto import ResumeCreateIn, ResumeUpdateIn, ResumeOut
 from src.service.resume.r_exceptions import ResumeAlreadyExists, ResumeNotFound, ForbiddenResumeAccess
 
 from src.presentation.api.dependencies import get_current_user
-
+from tests.unit.conftest import resume_service
 
 router = APIRouter(
     prefix="/resumes",
@@ -59,6 +59,23 @@ async def list_my_resumes(
         )
 
     return await resume_service.list_by_applicant(current_user.user_id)
+
+@router.get("/search/", response_model=List[ResumeOut])
+async def search_resumes(
+        desired_position: Optional[str] = None,
+        min_experience: Optional[int] = None,
+        is_active: bool = True,
+        limit: int = 15,
+        offset: int = 0,
+        resume_service=Depends(get_resume_service)
+):
+    return await resume_service.search(
+            desired_position,
+            min_experience,
+            is_active,
+            limit,
+            offset,
+        )
 
 
 @router.get("/{resume_id}", response_model=ResumeOut)

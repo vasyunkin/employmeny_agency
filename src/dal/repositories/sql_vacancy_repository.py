@@ -38,8 +38,8 @@ class SqlVacancyRepository(VacancyRepository):
         self,
         title: Optional[str] = None,
         min_salary: Optional[float] = None,
-        is_active: Optional[bool] = True,
-        limit: int = 50,
+        is_active: bool = True,
+        limit: int = 15,
         offset: int = 0
     ) -> list[Vacancy]:
 
@@ -55,12 +55,8 @@ class SqlVacancyRepository(VacancyRepository):
                 Vacancy.salary >= min_salary
             )
 
-        if is_active is not None:
-            stmt = stmt.where(
-                Vacancy.is_active == is_active
-            )
+        stmt = stmt.where(Vacancy.is_active == is_active)
 
         stmt = stmt.limit(limit).offset(offset)
-
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
