@@ -16,6 +16,7 @@ from src.dal.repositories.sql_match_repository import SqlMatchRepository
 from src.dal.repositories.sql_interview_slot_repository import SqlInterviewSlotRepository
 from src.dal.repositories.sql_interview_repository import SqlInterviewRepository
 from src.dal.repositories.sql_notification_repository import SqlNotificationRepository
+from src.domain.match import Match
 
 
 class SqlAlchemyUnitOfWork(UnitOfWork):
@@ -73,17 +74,19 @@ class SqlAlchemyUnitOfWork(UnitOfWork):
             self._notification = SqlNotificationRepository(self._session)
         return self._notification
 
+    async def get_match_detail(self, match_id: int) -> Match | None:
+        match = await self.match.get_by_id(match_id)
 
-    async def get_match_detail(self, match_id: int) -> Optional["Match"]:
-        match = await self._match.get_by_id(match_id)
         if match:
-            resume = await self.resume.get_by_id(match.resume_id)
-            vacancy = await self.vacancy.get_by_id(match.vacancy_id)
+            if match.resume_id:
+                resume = await self.resume.get_by_id(match.resume_id)
+                if resume:
+                    match.resume = resume
 
-            if resume:
-                match.resume = resume
-            if vacancy:
-                match.vacancy = vacancy
+            if match.vacancy_id:
+                vacancy = await self.vacancy.get_by_id(match.vacancy_id)
+                if vacancy:
+                    match.vacancy = vacancy
 
         return match
 

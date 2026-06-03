@@ -48,7 +48,6 @@ if (!token) window.location.href = "/";
 let selectedMatch = null;
 
 async function loadMatch() {
-    // Добавлен префикс /api
     const res = await fetch(`/api/matches/${matchId}`, {
         headers: {
             "Authorization": "Bearer " + token
@@ -67,35 +66,55 @@ async function loadMatch() {
 function renderSelected() {
     const container = document.getElementById("selectedItem");
 
-    if (selectedMatch.resume && !selectedMatch.vacancy) {
-        const r = selectedMatch.resume;
-
-        container.innerHTML = `
-            <h5 class="fw-bold mb-3" style="color: #ffb07c;">Выбрано резюме</h5>
-            <h6 class="fw-bold text-light">${r.desired_position}</h6>
-            <p class="mb-1">💰 ${r.desired_salary ? r.desired_salary + ' руб.' : "не указана"}</p>
-            <p class="mb-3">📊 Опыт: ${r.experience_years} лет</p>
-
-            <hr class="border-secondary">
-
-            <p><strong>Навыки:</strong><br><span style="white-space: pre-line;">${r.skills ?? "-"}</span></p>
-            <p><strong>Образование:</strong><br><span style="white-space: pre-line;">${r.education ?? "-"}</span></p>
-        `;
+    if (!selectedMatch) {
+        container.innerHTML = `<div class="text-center text-danger py-4">Ошибка загрузки</div>`;
+        return;
     }
 
-    if (selectedMatch.vacancy && !selectedMatch.resume) {
-        const v = selectedMatch.vacancy;
+    // === Случай: выбран только resume ===
+    if (selectedMatch.resume_id && !selectedMatch.vacancy_id) {
+        if (selectedMatch.resume && Object.keys(selectedMatch.resume).length > 0) {
+            const r = selectedMatch.resume;
+            container.innerHTML = `
+                <h5 class="fw-bold mb-3" style="color: #ffb07c;">Выбрано резюме</h5>
+                <h6 class="fw-bold text-light">${r.desired_position}</h6>
+                <p class="mb-1">💰 ${r.desired_salary ? r.desired_salary + ' руб.' : "не указана"}</p>
+                <p class="mb-3">📊 Опыт: ${r.experience_years} лет</p>
+                <hr class="border-secondary">
+                <p><strong>Навыки:</strong><br><span style="white-space: pre-line;">${r.skills ?? "-"}</span></p>
+                <p><strong>Образование:</strong><br><span style="white-space: pre-line;">${r.education ?? "-"}</span></p>
+            `;
+        } else {
+            container.innerHTML = `
+                <h5 class="fw-bold mb-3" style="color: #ffb07c;">Выбрано резюме</h5>
+                <p class="text-muted">Резюме ID: ${selectedMatch.resume_id}</p>
+                <small class="text-warning">Детали резюме не загружены</small>
+            `;
+        }
+    }
 
-        container.innerHTML = `
-            <h5 class="fw-bold mb-3" style="color: #ffb07c;">Выбрана вакансия</h5>
-            <h6 class="fw-bold text-light">${v.title}</h6>
-            <p class="mb-3">💰 ${v.salary ? v.salary + ' руб.' : "не указана"}</p>
-
-            <hr class="border-secondary">
-
-            <p><strong>Требования:</strong><br><span style="white-space: pre-line;">${v.requirements ?? "-"}</span></p>
-            <p><strong>Обязанности:</strong><br><span style="white-space: pre-line;">${v.responsibilities ?? "-"}</span></p>
-        `;
+    // === Случай: выбран только vacancy ===
+    else if (selectedMatch.vacancy_id && !selectedMatch.resume_id) {
+        if (selectedMatch.vacancy && Object.keys(selectedMatch.vacancy).length > 0) {
+            const v = selectedMatch.vacancy;
+            container.innerHTML = `
+                <h5 class="fw-bold mb-3" style="color: #ffb07c;">Выбрана вакансия</h5>
+                <h6 class="fw-bold text-light">${v.title}</h6>
+                <p class="mb-3">💰 ${v.salary ? v.salary + ' руб.' : "не указана"}</p>
+                <hr class="border-secondary">
+                <p><strong>Требования:</strong><br><span style="white-space: pre-line;">${v.requirements ?? "-"}</span></p>
+                <p><strong>Обязанности:</strong><br><span style="white-space: pre-line;">${v.responsibilities ?? "-"}</span></p>
+            `;
+        } else {
+            container.innerHTML = `
+                <h5 class="fw-bold mb-3" style="color: #ffb07c;">Выбрана вакансия</h5>
+                <p class="text-muted">Вакансия ID: ${selectedMatch.vacancy_id}</p>
+                <small class="text-warning">Детали вакансии не загружены</small>
+            `;
+        }
+    }
+    else {
+        container.innerHTML = `<div class="text-center text-danger py-4">Некорректное состояние сопоставления</div>`;
     }
 }
 
@@ -103,14 +122,13 @@ async function loadItems() {
     let url = "";
 
     if (type === "resume") {
-        url = "/api/resumes/search/"; // Добавлен префикс /api
+        url = "/api/resumes/search/";
     } else if (type === "vacancy") {
-        url = "/api/vacancies/search/"; // Добавлен префикс /api
+        url = "/api/vacancies/search/";
     } else {
         return;
     }
 
-    // Добавлена авторизация токеном для поиска элементов
     const res = await fetch(url, {
         headers: {
             "Authorization": "Bearer " + token
@@ -209,7 +227,6 @@ async function completeMatch(id) {
         body = { vacancy_id: id };
     }
 
-    // Добавлен префикс /api к PATCH-запросу
     const res = await fetch(`/api/matches/${matchId}/acceptance`, {
         method: "PATCH",
         headers: {
@@ -224,7 +241,6 @@ async function completeMatch(id) {
         return;
     }
 
-    // Редирект на красивую HTML-страницу деталей сопоставления
     window.location.href = `/matches/${matchId}`;
 }
 

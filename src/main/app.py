@@ -77,6 +77,12 @@ def create_app() -> FastAPI:
         template = templates.env.get_template("match_select_first.html")
         return HTMLResponse(template.render({"request": request}))
 
+    @app.get("/match-select-second", response_class=HTMLResponse)
+    async def match_select_second(request: Request):
+        template = templates.env.get_template("match_select_second.html")
+        return HTMLResponse(template.render({"request": request}))
+
+
 
     app.include_router(auth_router, prefix="/api")
     app.include_router(resumes_router, prefix="/api")
