@@ -96,7 +96,6 @@ class MatchService:
     async def update_acceptance(
             self,
             match_id: int,
-            recruiter_id: int,
             data: MatchUpdateAcceptanceIn
     ) -> MatchOut:
         async with self.dal.uow as uow:

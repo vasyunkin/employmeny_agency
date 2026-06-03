@@ -128,7 +128,6 @@ async def update_match_acceptance(
     try:
         return await match_service.update_acceptance(
             match_id=match_id,
-            recruiter_id=current_user.user_id,
             data=data
         )
     except MatchNotFound as e:
