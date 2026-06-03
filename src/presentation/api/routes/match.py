@@ -15,7 +15,7 @@ from src.service.match.m_exceptions import (
     ForbiddenMatchAccess
 )
 
-from src.api.dependencies import get_current_user
+from src.presentation.api.dependencies import get_current_user
 
 router = APIRouter(
     prefix="/matches",

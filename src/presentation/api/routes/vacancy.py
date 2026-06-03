@@ -5,7 +5,7 @@ from src.service.vacancy.vacancy_service import VacancyService
 from src.service.vacancy.vacancy_dto import VacancyCreateIn, VacancyOut
 from src.service.vacancy.v_exceptions import VacancyNotFound, ForbiddenVacancyAccess
 
-from src.api.dependencies import get_current_user
+from src.presentation.api.dependencies import get_current_user
 
 
 router = APIRouter(

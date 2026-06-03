@@ -12,7 +12,7 @@ from src.service.notification.n_exceptions import (
     ForbiddenNotificationAccess
 )
 
-from src.api.dependencies import get_current_user
+from src.presentation.api.dependencies import get_current_user
 
 
 router = APIRouter(

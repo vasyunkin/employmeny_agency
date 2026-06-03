@@ -86,7 +86,7 @@ class MockCurrentUser:
 def app(session):
     app = create_app()
 
-    from src.api.dependencies import get_current_user
+    from src.presentation.api.dependencies import get_current_user
 
     async def override_get_current_user():
         return MockCurrentUser(user_id=300, user_role="recruiter", user_login="recruiter")
@@ -104,7 +104,7 @@ def client(app):
 
 @pytest.fixture
 def recruiter_client(app):
-    from src.api.dependencies import get_current_user
+    from src.presentation.api.dependencies import get_current_user
 
     async def override():
         return MockCurrentUser(user_id=300, user_role="recruiter", user_login="recruiter")
@@ -119,7 +119,7 @@ def recruiter_client(app):
 
 @pytest.fixture
 def applicant_client(app):
-    from src.api.dependencies import get_current_user
+    from src.presentation.api.dependencies import get_current_user
 
     async def override():
         return MockCurrentUser(user_id=100, user_role="applicant", user_login="applicant")
@@ -134,7 +134,7 @@ def applicant_client(app):
 
 @pytest.fixture
 def employer_client(app):
-    from src.api.dependencies import get_current_user
+    from src.presentation.api.dependencies import get_current_user
 
     async def override():
         return MockCurrentUser(user_id=200, user_role="employer", user_login="employer")
@@ -149,7 +149,7 @@ def employer_client(app):
 
 @pytest.fixture
 def other_recruiter_client(app):
-    from src.api.dependencies import get_current_user
+    from src.presentation.api.dependencies import get_current_user
 
     async def override():
         return MockCurrentUser(user_id=999, user_role="recruiter", user_login="other_recruiter")

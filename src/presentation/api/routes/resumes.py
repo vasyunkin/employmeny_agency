@@ -5,7 +5,7 @@ from src.service.resume.resume_service import ResumeService
 from src.service.resume.resume_dto import ResumeCreateIn, ResumeUpdateIn, ResumeOut
 from src.service.resume.r_exceptions import ResumeAlreadyExists, ResumeNotFound, ForbiddenResumeAccess
 
-from src.api.dependencies import get_current_user
+from src.presentation.api.dependencies import get_current_user
 
 
 router = APIRouter(

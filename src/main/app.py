@@ -3,11 +3,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 
-from src.api.v1.auth import router as auth_router
-from src.api.v1.resumes import router as resumes_router
-from src.api.v1.vacancy import router as vacancy_router
-from src.api.v1.match import router as match_router
-from src.api.v1.notification import router as notification_router
+from src.presentation.api.routes.auth import router as auth_router
+from src.presentation.api.routes.resumes import router as resumes_router
+from src.presentation.api.routes.vacancy import router as vacancy_router
+from src.presentation.api.routes.match import router as match_router
+from src.presentation.api.routes.notification import router as notification_router
 from src.main.ioc import setup_di
 
 templates = Jinja2Templates(directory="src/presentation/templates")
