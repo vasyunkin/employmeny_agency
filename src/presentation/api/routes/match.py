@@ -83,8 +83,6 @@ async def get_match_detail(
         )
     except MatchNotFound as e:
         raise HTTPException(status_code=404, detail=str(e))
-    except ForbiddenMatchAccess as e:
-        raise HTTPException(status_code=403, detail=str(e))
 
 
 @router.post("/{match_id}/notify")

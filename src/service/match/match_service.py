@@ -61,13 +61,13 @@ class MatchService:
             await self.notification_creator.on_match_created(uow, match)
             await uow.commit()
 
-    async def get_by_id(self, match_id: int, recruiter_id: int) -> MatchDetailOut:
+    async def get_by_id(self, match_id: int, recruiter_id: int = None) -> MatchDetailOut:
         async with self.dal.uow as uow:
             match = await uow.get_match_detail(match_id)
+
             if not match:
                 raise MatchNotFound(match_id)
-            if match.recruiter_id != recruiter_id:
-                raise ForbiddenMatchAccess(match_id, recruiter_id)
+
             return MatchDetailOut.model_validate(match)
 
     async def list_by_recruiter(self, recruiter_id: int) -> list[MatchOut]:
@@ -103,8 +103,6 @@ class MatchService:
             match = await uow.get_match_detail(match_id)
             if not match:
                 raise MatchNotFound(match_id)
-            if match.recruiter_id != recruiter_id:
-                raise ForbiddenMatchAccess(match_id, recruiter_id)
 
             if data.resume_id is not None:
                 match.resume_id = data.resume_id
