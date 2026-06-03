@@ -22,7 +22,7 @@
         <div class="d-flex align-items-center gap-3">
 
             <button class="btn btn-outline-custom" data-bs-toggle="offcanvas" data-bs-target="#notificationsPanel">
-                🔔
+                🔔 <span id="notificationBadge" class="badge bg-danger" style="display: none;"></span>
             </button>
 
             <button class="btn btn-outline-custom" onclick="logout()">
@@ -39,7 +39,7 @@
 
 <div class="offcanvas offcanvas-end custom-offcanvas" tabindex="-1" id="notificationsPanel">
     <div class="offcanvas-header">
-        <h5 class="fw-bold">Уведомления</h5>
+        <h5 class="fw-bold text-light">Уведомления</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
     </div>
 
@@ -59,40 +59,62 @@
 <script>
 async function loadNotifications() {
     const token = localStorage.getItem("token");
+    if (!token) return;
 
-    const res = await fetch("/notifications", {
+    const res = await fetch("/api/notifications", {
         headers: {
             "Authorization": "Bearer " + token
         }
     });
 
     const container = document.getElementById("notificationsList");
+    const badge = document.getElementById("notificationBadge");
     container.innerHTML = "";
 
     if (!res.ok) return;
 
     const data = await res.json();
 
-    if (data.length === 0) {
-        container.innerHTML = "<p class='text-muted'>Нет уведомлений</p>";
+    // ИСПРАВЛЕНО: Так как модель возвращает NotificationListOut, данные лежат в data.items
+    const items = data.items || [];
+
+    // Фильтруем только непрочитанные для счетчика на колокольчике
+    const unreadCount = items.filter(n => !n.is_read).length;
+    if (unreadCount > 0) {
+        badge.innerText = unreadCount;
+        badge.style.display = "inline-block";
+    } else {
+        badge.style.display = "none";
+    }
+
+    if (items.length === 0) {
+        container.innerHTML = "<p class='text-muted text-center mt-3'>Нет уведомлений</p>";
         return;
     }
 
-    data.forEach(n => {
+    items.forEach(n => {
         const item = document.createElement("div");
-        item.className = "notification-item";
+        item.className = `notification-item p-3 mb-2 rounded ${n.is_read ? 'opacity-50' : 'bg-dark border-start border-custom border-3'}`;
+
+        // Пытаемся вытащить match_id, если бэкенд передает его в объекте (сделаем на Шаге 2)
+        const matchId = n.match_id || null;
 
         item.innerHTML = `
-            <div class="mb-2 fw-semibold">${n.notification_type}</div>
-            <div class="mb-3">${n.message}</div>
+            <div class="mb-1 fw-bold text-custom" style="color: #ffb07c;">${n.notification_type}</div>
+            <div class="mb-3 text-light small">${n.message}</div>
 
-            <div class="d-flex gap-2">
-                <button class="btn btn-sm btn-outline-custom" onclick="goToNotification()">
-                    Перейти
-                </button>
-                <button class="btn btn-sm btn-outline-custom" onclick="markRead(${n.notification_id})">
-                    ✓
-                </button>
+            <div class="d-flex justify-content-between align-items-center">
+                ${matchId ? `
+                    <button class="btn btn-sm btn-outline-custom" onclick="goToNotification(${matchId})">
+                        Перейти к сопоставлению
+                    </button>
+                ` : '<span class="text-muted small">Системное</span>'}
+
+                ${!n.is_read ? `
+                    <button class="btn btn-sm btn-custom py-0 px-2" onclick="markRead(${n.notification_id})">
+                        ✓
+                    </button>
+                ` : ''}
             </div>
         `;
 
@@ -103,7 +125,8 @@ async function loadNotifications() {
 async function markRead(id) {
     const token = localStorage.getItem("token");
 
-    await fetch(`/notifications/${id}/read`, {
+    // ИСПРАВЛЕНО: Добавлен префикс /api
+    await fetch(`/api/notifications/${id}/read`, {
         method: "PATCH",
         headers: {
             "Authorization": "Bearer " + token
@@ -116,7 +139,7 @@ async function markRead(id) {
 async function markAllRead() {
     const token = localStorage.getItem("token");
 
-    await fetch(`/notifications/read-all`, {
+    await fetch(`/api/notifications/read-all`, {
         method: "PATCH",
         headers: {
             "Authorization": "Bearer " + token
@@ -126,8 +149,12 @@ async function markAllRead() {
     loadNotifications();
 }
 
-function goToNotification() {
-    alert("Навигация будет добавлена позже");
+function goToNotification(matchId) {
+    if (matchId) {
+        window.location.href = `/matches/${matchId}`;
+    } else {
+        alert("Ссылка недоступна");
+    }
 }
 
 function logout() {
@@ -136,6 +163,7 @@ function logout() {
 }
 
 document.addEventListener("DOMContentLoaded", loadNotifications);
+setInterval(loadNotifications, 30000);
 </script>
 
 {% block extra_js %}{% endblock %}

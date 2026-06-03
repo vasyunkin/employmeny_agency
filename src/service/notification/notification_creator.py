@@ -5,11 +5,6 @@ from src.domain.notification import Notification
 
 
 class NotificationCreator:
-    """
-    Сценарный слой для генерации уведомлений
-    (работает внутри существующего uow)
-    """
-
     def __init__(self, dal: FromDishka[DALFacade]):
         self.dal = dal
 
@@ -20,10 +15,6 @@ class NotificationCreator:
             message=message
         )
         await uow.notification.create(notification)
-
-    # =========================
-    # MATCH CREATED
-    # =========================
 
     async def on_match_created(self, uow, match) -> None:
         resume = match.resume
@@ -45,10 +36,6 @@ class NotificationCreator:
             "match_created",
             f"Для вакансии '{vacancy.title}' найден кандидат."
         )
-
-    # =========================
-    # ACCEPTANCE CHANGED
-    # =========================
 
     async def on_acceptance_changed(self, uow, match) -> None:
         resume = match.resume

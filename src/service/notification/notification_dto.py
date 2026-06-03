@@ -18,6 +18,6 @@ class NotificationOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class NotificationListOut(BaseModel):
+class NotificationListResponse(BaseModel):
     items: list[NotificationOut]
-    total: int = 0
+    total: int
