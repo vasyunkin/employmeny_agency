@@ -134,13 +134,13 @@ form.onsubmit = async (e) => {
         return;
     }
 
-    if (mode === "resume") window.location.href = "/resumes-page";
-    if (mode === "vacancy") window.location.href = "/vacancies-page";
+    if (mode === "resume") window.location.href = "/resumes";
+    if (mode === "vacancy") window.location.href = "/vacancies";
 };
 
 function goBack() {
-    if (mode === "resume") window.location.href = "/resumes-page";
-    if (mode === "vacancy") window.location.href = "/vacancies-page";
+    if (mode === "resume") window.location.href = "/resumes";
+    if (mode === "vacancy") window.location.href = "/vacancies";
 }
 
 document.addEventListener("DOMContentLoaded", renderForm);

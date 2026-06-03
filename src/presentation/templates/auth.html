@@ -97,11 +97,11 @@ document.getElementById("loginForm").onsubmit = async (e) => {
     const payload = JSON.parse(atob(data.access_token.split('.')[1]));
 
     if (payload.role === "applicant") {
-        window.location.href = "/resumes-page";
+        window.location.href = "/resumes";
     } else if (payload.role === "employer") {
-        window.location.href = "/vacancies-page";
+        window.location.href = "/vacancies";
     } else {
-        window.location.href = "/matches-page";
+        window.location.href = "/matches";
     }
 };
 

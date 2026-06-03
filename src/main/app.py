@@ -29,17 +29,17 @@ def create_app() -> FastAPI:
         return HTMLResponse(content)
 
 
-    @app.get("/resumes-page", response_class=HTMLResponse)
+    @app.get("/resumes", response_class=HTMLResponse)
     async def resumes_page(request: Request):
         template = templates.env.get_template("items.html")
         return HTMLResponse(template.render({"request": request}))
 
-    @app.get("/vacancies-page", response_class=HTMLResponse)
+    @app.get("/vacancies", response_class=HTMLResponse)
     async def vacancies_page(request: Request):
         template = templates.env.get_template("items.html")
         return HTMLResponse(template.render({"request": request}))
 
-    @app.get("/matches-page", response_class=HTMLResponse)
+    @app.get("/matches", response_class=HTMLResponse)
     async def matches_page(request: Request):
         template = templates.env.get_template("items.html")
         return HTMLResponse(template.render({"request": request}))
