@@ -24,7 +24,9 @@
 
     async function loadDetail() {
       const token = localStorage.getItem("token");
-      const res = await fetch(`/${entityType}/${entityId}`, {
+
+      // Добавляем префикс /api/, чтобы запросить JSON-данные у роутера, а не HTML страницу
+      const res = await fetch(`/api/${entityType}/${entityId}`, {
         headers: {
           "Authorization": "Bearer " + token
         }
@@ -33,7 +35,7 @@
       const container = document.getElementById("content");
 
       if (!res.ok) {
-        container.innerHTML = `<p class="text-danger">Ошибка загрузки</p>`;
+        container.innerHTML = `<p class="text-danger">Ошибка загрузки данных (${res.status})</p>`;
         return;
       }
 
@@ -52,12 +54,9 @@
       document.getElementById("content").innerHTML = `
         <div class="detail-card">
           <h3 class="fw-bold mb-3">${r.desired_position}</h3>
-
           <p>💰 Зарплата: ${r.desired_salary ?? "не указана"}</p>
           <p>📊 Опыт: ${r.experience_years} лет</p>
-
           <hr>
-
           <p><strong>Навыки:</strong><br>${r.skills ?? "не указаны"}</p>
           <p><strong>Образование:</strong><br>${r.education ?? "не указано"}</p>
         </div>
@@ -68,11 +67,8 @@
       document.getElementById("content").innerHTML = `
         <div class="detail-card">
           <h3 class="fw-bold mb-3">${v.title}</h3>
-
           <p>💰 Зарплата: ${v.salary ?? "не указана"}</p>
-
           <hr>
-
           <p><strong>Требования:</strong><br>${v.requirements ?? "не указаны"}</p>
           <p><strong>Обязанности:</strong><br>${v.responsibilities ?? "не указаны"}</p>
         </div>
@@ -87,7 +83,6 @@
           <p>Applicant: ${formatStatus(m.applicant_accepted)}</p>
           <p>Employer: ${formatStatus(m.employer_accepted)}</p>
         </div>
-
         <div class="row g-4">
           <div class="col-md-6">
             <div class="detail-card">
@@ -96,7 +91,6 @@
               <p>📊 ${m.resume.experience_years} лет</p>
             </div>
           </div>
-
           <div class="col-md-6">
             <div class="detail-card">
               <h5 class="fw-bold mb-2">${m.vacancy.title}</h5>

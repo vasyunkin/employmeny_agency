@@ -98,7 +98,7 @@ form.onsubmit = async (e) => {
     let body = {};
 
     if (mode === "resume") {
-        url = "/resumes";
+        url = "/api/resumes"; // Добавлен префикс /api
 
         body = {
             desired_position: document.getElementById("desired_position").value,
@@ -110,7 +110,7 @@ form.onsubmit = async (e) => {
     }
 
     if (mode === "vacancy") {
-        url = "/vacancies";
+        url = "/api/vacancies"; // Добавлен префикс /api
 
         body = {
             title: document.getElementById("title").value,

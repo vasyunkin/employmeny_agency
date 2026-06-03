@@ -36,7 +36,7 @@ function resolveConfig() {
     if (payload.role === "applicant") {
         config = {
             title: "Мои резюме",
-            endpoint: "/resumes",
+            endpoint: "/api/resumes", // Добавлен префикс /api
             createText: "Создать резюме",
             createUrl: "/create/resume",
             render: renderResume
@@ -44,7 +44,7 @@ function resolveConfig() {
     } else if (payload.role === "employer") {
         config = {
             title: "Мои вакансии",
-            endpoint: "/vacancies",
+            endpoint: "/api/vacancies", // Добавлен префикс /api
             createText: "Создать вакансию",
             createUrl: "/create/vacancy",
             render: renderVacancy
@@ -52,7 +52,7 @@ function resolveConfig() {
     } else {
         config = {
             title: "Мои сопоставления",
-            endpoint: "/matches",
+            endpoint: "/api/matches", // Добавлен префикс /api
             createText: "",
             createUrl: null,
             render: renderMatch
@@ -63,6 +63,7 @@ function resolveConfig() {
 
     const createBtn = document.getElementById("createBtn");
     createBtn.innerText = config.createText;
+    if (!config.createUrl) createBtn.style.display = "none";
 }
 
 async function loadItems() {
@@ -97,26 +98,17 @@ async function loadItems() {
 function baseCard(content) {
     const col = document.createElement("div");
     col.className = "col-md-6";
-
-    col.innerHTML = `
-        <div class="item-card">
-            ${content}
-        </div>
-    `;
-
+    col.innerHTML = `<div class="item-card">${content}</div>`;
     return col;
 }
 
 /* ===== RENDERERS ===== */
-
 function renderResume(r) {
     return baseCard(`
         <h5 class="fw-bold mb-2">${r.desired_position}</h5>
         <p class="mb-1">💰 Зарплата: ${r.desired_salary ?? "не указана"}</p>
         <p class="mb-3">📊 Опыт: ${r.experience_years} лет</p>
-
-        <button class="btn btn-outline-custom w-100"
-            onclick="openItem('/resumes/${r.resume_id}')">
+        <button class="btn btn-outline-custom w-100" onclick="openItem('/resumes/${r.resume_id}')">
             Подробнее
         </button>
     `);
@@ -127,9 +119,7 @@ function renderVacancy(v) {
         <h5 class="fw-bold mb-2">${v.title}</h5>
         <p class="mb-1">💰 Зарплата: ${v.salary ?? "не указана"}</p>
         <p class="mb-3">📄 Требования: ${v.requirements ?? "-"}</p>
-
-        <button class="btn btn-outline-custom w-100"
-            onclick="openItem('/vacancies/${v.vacancy_id}')">
+        <button class="btn btn-outline-custom w-100" onclick="openItem('/vacancies/${v.vacancy_id}')">
             Подробнее
         </button>
     `);
@@ -141,24 +131,18 @@ function renderMatch(m) {
         <p class="mb-1">📄 ID Резюме: ${m.resume_id}</p>
         <p class="mb-1">🏢 ID Вакансии: ${m.vacancy_id}</p>
         <p class="mb-3">📊 Активен: ${m.is_active ? "Да" : "Нет"}</p>
-
-        <button class="btn btn-outline-custom w-100"
-            onclick="openItem('/matches/${m.match_id}')">
+        <button class="btn btn-outline-custom w-100" onclick="openItem('/matches/${m.match_id}')">
             Подробнее
         </button>
     `);
 }
-
-/* ===== HELPERS ===== */
 
 function openItem(url) {
     window.location.href = url;
 }
 
 function createItem() {
-    if (config.createUrl) {
-        window.location.href = config.createUrl;
-    }
+    if (config.createUrl) window.location.href = config.createUrl;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
