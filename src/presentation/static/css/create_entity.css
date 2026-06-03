@@ -1,0 +1,41 @@
+h2 {
+    color: #ffb07c;
+}
+
+.form-card {
+    background-color: #211e1b;
+    border: 1px solid #332e29;
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-control, textarea {
+    background-color: #2c2724 !important;
+    border: 1px solid #423b36 !important;
+    color: #fff !important;
+    border-radius: 10px !important;
+    padding: 12px 16px;
+}
+
+.form-control::placeholder,
+textarea::placeholder {
+    color: #8c827a;
+}
+
+.form-control:focus,
+textarea:focus {
+    border-color: #ffb07c !important;
+    box-shadow: 0 0 0 3px rgba(255, 176, 124, 0.15) !important;
+}
+
+textarea {
+    min-height: 120px;
+}
+
+.error-message {
+    color: #ff7676;
+    margin-top: 10px;
+    text-align: center;
+}

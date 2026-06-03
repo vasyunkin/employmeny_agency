@@ -1,0 +1,19 @@
+.detail-card {
+    background-color: #211e1b;
+    border: 1px solid #332e29;
+    border-radius: 16px;
+    padding: 25px;
+    transition: all 0.3s ease;
+}
+
+.detail-card:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+h3, h4, h5 {
+    color: #ffb07c;
+}
+
+hr {
+    border-color: #332e29;
+}

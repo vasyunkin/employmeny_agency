@@ -11,7 +11,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 id="pageTitle" class="fw-bold m-0"></h2>
-        <button id="createBtn" class="btn btn-custom"></button>
+        <button id="createBtn" class="btn btn-custom" onclick="createItem()"></button>
     </div>
 
     <div id="emptyMessage" class="text-center mt-5" style="display:none;">
@@ -26,6 +26,8 @@
 {% block extra_js %}
 <script>
 const token = localStorage.getItem("token");
+if (!token) window.location.href = "/";
+
 const payload = JSON.parse(atob(token.split('.')[1]));
 
 let config = {};
@@ -36,6 +38,7 @@ function resolveConfig() {
             title: "Мои резюме",
             endpoint: "/resumes",
             createText: "Создать резюме",
+            createUrl: "/create/resume",
             render: renderResume
         };
     } else if (payload.role === "employer") {
@@ -43,19 +46,23 @@ function resolveConfig() {
             title: "Мои вакансии",
             endpoint: "/vacancies",
             createText: "Создать вакансию",
+            createUrl: "/create/vacancy",
             render: renderVacancy
         };
     } else {
         config = {
             title: "Мои сопоставления",
             endpoint: "/matches",
-            createText: "Создать сопоставление",
+            createText: "",
+            createUrl: null,
             render: renderMatch
         };
     }
 
     document.getElementById("pageTitle").innerText = config.title;
-    document.getElementById("createBtn").innerText = config.createText;
+
+    const createBtn = document.getElementById("createBtn");
+    createBtn.innerText = config.createText;
 }
 
 async function loadItems() {
@@ -65,6 +72,8 @@ async function loadItems() {
 
     const container = document.getElementById("itemsContainer");
     const empty = document.getElementById("emptyMessage");
+
+    container.innerHTML = "";
 
     if (!res.ok) {
         empty.style.display = "block";
@@ -78,7 +87,6 @@ async function loadItems() {
         return;
     }
 
-    container.innerHTML = "";
     empty.style.display = "none";
 
     data.forEach(item => {
@@ -129,9 +137,9 @@ function renderVacancy(v) {
 
 function renderMatch(m) {
     return baseCard(`
-        <h5 class="fw-bold mb-2">Match #${m.match_id}</h5>
-        <p class="mb-1">📄 Resume ID: ${m.resume_id}</p>
-        <p class="mb-1">🏢 Vacancy ID: ${m.vacancy_id}</p>
+        <h5 class="fw-bold mb-2">Сопоставление #${m.match_id}</h5>
+        <p class="mb-1">📄 ID Резюме: ${m.resume_id}</p>
+        <p class="mb-1">🏢 ID Вакансии: ${m.vacancy_id}</p>
         <p class="mb-3">📊 Активен: ${m.is_active ? "Да" : "Нет"}</p>
 
         <button class="btn btn-outline-custom w-100"
@@ -148,10 +156,10 @@ function openItem(url) {
 }
 
 function createItem() {
-    alert("Форма создания будет следующей страницей");
+    if (config.createUrl) {
+        window.location.href = config.createUrl;
+    }
 }
-
-document.getElementById("createBtn").onclick = createItem;
 
 document.addEventListener("DOMContentLoaded", () => {
     resolveConfig();

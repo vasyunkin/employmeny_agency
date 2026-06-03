@@ -28,14 +28,47 @@ def create_app() -> FastAPI:
         content = template.render({"request": request})
         return HTMLResponse(content)
 
+
     @app.get("/resumes-page", response_class=HTMLResponse)
     async def resumes_page(request: Request):
         template = templates.env.get_template("items.html")
         return HTMLResponse(template.render({"request": request}))
 
     @app.get("/vacancies-page", response_class=HTMLResponse)
-    async def resumes_page(request: Request):
+    async def vacancies_page(request: Request):
         template = templates.env.get_template("items.html")
+        return HTMLResponse(template.render({"request": request}))
+
+    @app.get("/matches-page", response_class=HTMLResponse)
+    async def matches_page(request: Request):
+        template = templates.env.get_template("items.html")
+        return HTMLResponse(template.render({"request": request}))
+
+
+    @app.get("/resumes/{resume_id}", response_class=HTMLResponse)
+    async def resume_detail_page(request: Request):
+        template = templates.env.get_template("entity_detail.html")
+        return HTMLResponse(template.render({"request": request}))
+
+    @app.get("/vacancies/{vacancy_id}", response_class=HTMLResponse)
+    async def vacancy_detail_page(request: Request):
+        template = templates.env.get_template("entity_detail.html")
+        return HTMLResponse(template.render({"request": request}))
+
+    @app.get("/matches/{match_id}", response_class=HTMLResponse)
+    async def match_detail_page(request: Request):
+        template = templates.env.get_template("entity_detail.html")
+        return HTMLResponse(template.render({"request": request}))
+
+
+    @app.get("/create/resume", response_class=HTMLResponse)
+    async def create_resume_page(request: Request):
+        template = templates.env.get_template("create_entity.html")
+        return HTMLResponse(template.render({"request": request}))
+
+    @app.get("/create/vacancy", response_class=HTMLResponse)
+    async def create_vacancy_page(request: Request):
+        template = templates.env.get_template("create_entity.html")
         return HTMLResponse(template.render({"request": request}))
 
 

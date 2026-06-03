@@ -1,0 +1,148 @@
+{% extends "layout.html" %}
+
+{% block title %}Создание{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/create.css">
+{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+        <h2 id="pageTitle" class="fw-bold m-0"></h2>
+        <button class="btn btn-outline-custom" onclick="goBack()">← Назад</button>
+    </div>
+
+    <div class="form-card">
+        <form id="form"></form>
+        <p id="error" class="error-message"></p>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const path = window.location.pathname;
+
+let mode = null;
+
+if (path.includes("resume")) mode = "resume";
+if (path.includes("vacancy")) mode = "vacancy";
+
+const form = document.getElementById("form");
+
+function renderForm() {
+    if (mode === "resume") {
+        document.getElementById("pageTitle").innerText = "Создать резюме";
+
+        form.innerHTML = `
+            <div class="mb-3">
+                <input class="form-control" id="desired_position" placeholder="Желаемая позиция" required>
+            </div>
+
+            <div class="mb-3">
+                <input class="form-control" type="number" id="desired_salary" placeholder="Желаемая зарплата">
+            </div>
+
+            <div class="mb-3">
+                <input class="form-control" type="number" id="experience_years" placeholder="Опыт (лет)">
+            </div>
+
+            <div class="mb-3">
+                <textarea class="form-control" id="skills" placeholder="Навыки"></textarea>
+            </div>
+
+            <div class="mb-4">
+                <textarea class="form-control" id="education" placeholder="Образование"></textarea>
+            </div>
+
+            <button class="btn btn-custom w-100">Создать</button>
+        `;
+    }
+
+    if (mode === "vacancy") {
+        document.getElementById("pageTitle").innerText = "Создать вакансию";
+
+        form.innerHTML = `
+            <div class="mb-3">
+                <input class="form-control" id="title" placeholder="Название вакансии" required>
+            </div>
+
+            <div class="mb-3">
+                <input class="form-control" type="number" id="salary" placeholder="Зарплата">
+            </div>
+
+            <div class="mb-3">
+                <textarea class="form-control" id="requirements" placeholder="Требования"></textarea>
+            </div>
+
+            <div class="mb-4">
+                <textarea class="form-control" id="responsibilities" placeholder="Обязанности"></textarea>
+            </div>
+
+            <button class="btn btn-custom w-100">Создать</button>
+        `;
+    }
+}
+
+form.onsubmit = async (e) => {
+    e.preventDefault();
+
+    const token = localStorage.getItem("token");
+    const error = document.getElementById("error");
+    error.innerText = "";
+
+    let url = "";
+    let body = {};
+
+    if (mode === "resume") {
+        url = "/resumes";
+
+        body = {
+            desired_position: document.getElementById("desired_position").value,
+            desired_salary: document.getElementById("desired_salary").value || null,
+            experience_years: Number(document.getElementById("experience_years").value || 0),
+            skills: document.getElementById("skills").value || null,
+            education: document.getElementById("education").value || null
+        };
+    }
+
+    if (mode === "vacancy") {
+        url = "/vacancies";
+
+        body = {
+            title: document.getElementById("title").value,
+            salary: document.getElementById("salary").value || null,
+            requirements: document.getElementById("requirements").value || null,
+            responsibilities: document.getElementById("responsibilities").value || null
+        };
+    }
+
+    const res = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+        error.innerText = "Ошибка создания";
+        return;
+    }
+
+    if (mode === "resume") window.location.href = "/resumes-page";
+    if (mode === "vacancy") window.location.href = "/vacancies-page";
+};
+
+function goBack() {
+    if (mode === "resume") window.location.href = "/resumes-page";
+    if (mode === "vacancy") window.location.href = "/vacancies-page";
+}
+
+document.addEventListener("DOMContentLoaded", renderForm);
+</script>
+{% endblock %}

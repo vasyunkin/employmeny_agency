@@ -1,0 +1,128 @@
+{% extends "layout.html" %}
+
+{% block title %}Детали{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="/static/css/entity_detail.css">
+{% endblock %}
+
+{% block content %}
+  <div class="container py-3">
+    <div class="mb-4">
+      <button class="btn btn-outline-custom" onclick="goBack()">← Назад</button>
+    </div>
+
+    <div id="content"></div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script>
+    const pathParts = window.location.pathname.split("/");
+    const entityType = pathParts[1]; // resumes | vacancies | matches
+    const entityId = pathParts[2];
+
+    async function loadDetail() {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`/${entityType}/${entityId}`, {
+        headers: {
+          "Authorization": "Bearer " + token
+        }
+      });
+
+      const container = document.getElementById("content");
+
+      if (!res.ok) {
+        container.innerHTML = `<p class="text-danger">Ошибка загрузки</p>`;
+        return;
+      }
+
+      const data = await res.json();
+
+      if (entityType === "resumes") {
+        renderResume(data);
+      } else if (entityType === "vacancies") {
+        renderVacancy(data);
+      } else {
+        renderMatch(data);
+      }
+    }
+
+    function renderResume(r) {
+      document.getElementById("content").innerHTML = `
+        <div class="detail-card">
+          <h3 class="fw-bold mb-3">${r.desired_position}</h3>
+
+          <p>💰 Зарплата: ${r.desired_salary ?? "не указана"}</p>
+          <p>📊 Опыт: ${r.experience_years} лет</p>
+
+          <hr>
+
+          <p><strong>Навыки:</strong><br>${r.skills ?? "не указаны"}</p>
+          <p><strong>Образование:</strong><br>${r.education ?? "не указано"}</p>
+        </div>
+      `;
+    }
+
+    function renderVacancy(v) {
+      document.getElementById("content").innerHTML = `
+        <div class="detail-card">
+          <h3 class="fw-bold mb-3">${v.title}</h3>
+
+          <p>💰 Зарплата: ${v.salary ?? "не указана"}</p>
+
+          <hr>
+
+          <p><strong>Требования:</strong><br>${v.requirements ?? "не указаны"}</p>
+          <p><strong>Обязанности:</strong><br>${v.responsibilities ?? "не указаны"}</p>
+        </div>
+      `;
+    }
+
+    function renderMatch(m) {
+      document.getElementById("content").innerHTML = `
+        <div class="detail-card mb-4">
+          <h4 class="fw-bold">Сопоставление</h4>
+          <p>Статус: ${m.is_active ? "активно" : "закрыто"}</p>
+          <p>Applicant: ${formatStatus(m.applicant_accepted)}</p>
+          <p>Employer: ${formatStatus(m.employer_accepted)}</p>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="detail-card">
+              <h5 class="fw-bold mb-2">${m.resume.desired_position}</h5>
+              <p>💰 ${m.resume.desired_salary ?? "не указана"}</p>
+              <p>📊 ${m.resume.experience_years} лет</p>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="detail-card">
+              <h5 class="fw-bold mb-2">${m.vacancy.title}</h5>
+              <p>💰 ${m.vacancy.salary ?? "не указана"}</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function formatStatus(val) {
+      if (val === true) return "принято";
+      if (val === false) return "отклонено";
+      return "ожидание";
+    }
+
+    function goBack() {
+      if (entityType === "resumes") {
+        window.location.href = "/resumes-page";
+      } else if (entityType === "vacancies") {
+        window.location.href = "/vacancies-page";
+      } else {
+        window.location.href = "/matches-page";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadDetail);
+  </script>
+{% endblock %}
