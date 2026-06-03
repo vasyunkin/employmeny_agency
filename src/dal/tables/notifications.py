@@ -14,6 +14,12 @@ notifications_table = Table(
         ForeignKey('users.user_id', ondelete='CASCADE'),
         nullable=False
     ),
+    Column(
+        'match_id',
+        Integer,
+        ForeignKey('matches.match_id', ondelete='SET NULL'),
+        nullable=True
+    ),
     Column('notification_type', String(50)),
     Column('message', String),
     Column('is_read', Boolean, nullable=False, server_default='False'),

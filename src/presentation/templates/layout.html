@@ -75,10 +75,8 @@ async function loadNotifications() {
 
     const data = await res.json();
 
-    // ИСПРАВЛЕНО: Так как модель возвращает NotificationListOut, данные лежат в data.items
     const items = data.items || [];
 
-    // Фильтруем только непрочитанные для счетчика на колокольчике
     const unreadCount = items.filter(n => !n.is_read).length;
     if (unreadCount > 0) {
         badge.innerText = unreadCount;
@@ -96,7 +94,6 @@ async function loadNotifications() {
         const item = document.createElement("div");
         item.className = `notification-item p-3 mb-2 rounded ${n.is_read ? 'opacity-50' : 'bg-dark border-start border-custom border-3'}`;
 
-        // Пытаемся вытащить match_id, если бэкенд передает его в объекте (сделаем на Шаге 2)
         const matchId = n.match_id || null;
 
         item.innerHTML = `
@@ -125,7 +122,6 @@ async function loadNotifications() {
 async function markRead(id) {
     const token = localStorage.getItem("token");
 
-    // ИСПРАВЛЕНО: Добавлен префикс /api
     await fetch(`/api/notifications/${id}/read`, {
         method: "PATCH",
         headers: {

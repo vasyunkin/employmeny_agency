@@ -8,11 +8,12 @@ class NotificationCreator:
     def __init__(self, dal: FromDishka[DALFacade]):
         self.dal = dal
 
-    async def _create(self, uow, user_id: int, n_type: str, message: str):
+    async def _create(self, uow, user_id: int, n_type: str, message: str, match_id: int = None):
         notification = Notification(
             user_id=user_id,
             notification_type=n_type,
-            message=message
+            message=message,
+            match_id=match_id  # Добавлен match_id
         )
         await uow.notification.create(notification)
 
@@ -27,14 +28,16 @@ class NotificationCreator:
             uow,
             applicant_id,
             "match_created",
-            f"Подходящая вакансия для вас! -> '{vacancy.title}'."
+            f"Подходящая вакансия для вас! -> '{vacancy.title}'.",
+            match_id=match.match_id  # Передаем match_id
         )
 
         await self._create(
             uow,
             employer_id,
             "match_created",
-            f"Для вакансии '{vacancy.title}' найден кандидат."
+            f"Для вакансии '{vacancy.title}' найден кандидат.",
+            match_id=match.match_id  # Передаем match_id
         )
 
     async def on_acceptance_changed(self, uow, match) -> None:
@@ -55,7 +58,8 @@ class NotificationCreator:
                     uow,
                     user_id,
                     "match_failed",
-                    "Сделка не состоялась"
+                    "Сделка не состоялась",
+                    match_id=match.match_id  # Передаем match_id
                 )
             return
 
@@ -66,7 +70,8 @@ class NotificationCreator:
                     uow,
                     user_id,
                     "match_success",
-                    "Обе стороны согласились. Сделка успешно завершена!"
+                    "Обе стороны согласились. Сделка успешно завершена!",
+                    match_id=match.match_id  # Передаем match_id
                 )
             return
 
@@ -77,5 +82,6 @@ class NotificationCreator:
                     uow,
                     user_id,
                     "match_partial",
-                    "Одна из сторон приняла предложение"
+                    "Одна из сторон приняла предложение",
+                    match_id=match.match_id  # Передаем match_id
                 )

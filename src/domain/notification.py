@@ -5,6 +5,7 @@ from typing import Optional
 @dataclass
 class Notification:
     user_id: int
+    match_id: Optional[int] = None
     notification_type: Optional[str] = None
     message: Optional[str] = None
     is_read: bool = False

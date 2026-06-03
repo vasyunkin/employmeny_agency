@@ -23,6 +23,7 @@ class NotificationService:
                 user_id=data.user_id,
                 notification_type=data.notification_type,
                 message=data.message,
+                match_id=data.match_id  # Добавлен match_id
             )
 
             created = await uow.notification.create(notification)

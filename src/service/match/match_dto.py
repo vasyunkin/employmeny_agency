@@ -11,17 +11,16 @@ class MatchCreateIn(BaseModel):
 
 
 class MatchUpdateStatusIn(BaseModel):
-    """Обновление статуса мэтча"""
     is_active: bool
 
 
 class MatchUpdateAcceptanceIn(BaseModel):
-    """Обновление статуса принятия мэтча и привязка недостающих компонентов"""
     applicant_accepted: Optional[bool] = None
     employer_accepted: Optional[bool] = None
 
     resume_id: Optional[int] = Field(default=None, gt=0)
     vacancy_id: Optional[int] = Field(default=None, gt=0)
+
 
 class MatchOut(BaseModel):
     match_id: int
@@ -41,7 +40,6 @@ class MatchListOut(BaseModel):
 
 
 class MatchDetailOut(BaseModel):
-    """Полная информация о мэтче для рекрутера"""
     match_id: int
     resume_id: Optional[int]
     vacancy_id: Optional[int]

@@ -5,7 +5,7 @@ from src.service.notification.notification_service import NotificationService
 from src.service.notification.notification_creator import NotificationCreator
 
 from src.service.notification.notification_dto import (
-    NotificationOut, NotificationListResponse
+    NotificationOut, NotificationListOut
 )
 from src.service.notification.n_exceptions import (
     NotificationNotFound,
@@ -43,13 +43,13 @@ async def get_notification_creator(request: Request) -> NotificationCreator:
     return creator
 
 
-@router.get("/", response_model=NotificationListResponse)
+@router.get("/", response_model=NotificationListOut)
 async def list_notifications(
     notification_service: NotificationService = Depends(get_notification_service),
     current_user=Depends(get_current_user)
 ):
     notifications = await notification_service.list_by_user(current_user.user_id)
-    return NotificationListResponse(
+    return NotificationListOut(
         items=notifications,
         total=len(notifications)
     )
