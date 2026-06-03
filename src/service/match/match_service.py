@@ -1,10 +1,7 @@
 from dishka import FromDishka
-
 from src.dal.facade import DALFacade
 from src.domain.match import Match
-
 from src.service.notification.notification_creator import NotificationCreator
-
 from .match_dto import (
     MatchCreateIn,
     MatchUpdateStatusIn,
@@ -30,8 +27,9 @@ class MatchService:
 
     async def create(self, recruiter_id: int, data: MatchCreateIn) -> MatchOut:
         async with self.dal.uow as uow:
-            if await uow.match.exists(data.vacancy_id, data.resume_id):
-                raise MatchAlreadyExists(data.resume_id, data.vacancy_id)
+            if data.vacancy_id is not None and data.resume_id is not None:
+                if await uow.match.exists(data.vacancy_id, data.resume_id):
+                    raise MatchAlreadyExists(data.resume_id, data.vacancy_id)
 
             match = Match(
                 resume_id=data.resume_id,
@@ -44,16 +42,10 @@ class MatchService:
 
             created_match = await uow.match.create(match)
 
-            # получаем детали для уведомлений
-            detailed_match = await uow.get_match_detail(created_match.match_id)
-
-            await self.notification_creator.on_match_created(uow, detailed_match)
-
             await uow.commit()
-
             return MatchOut.model_validate(created_match)
 
-    async def get_by_id(self, match_id: int, recruiter_id: int) -> MatchDetailOut:
+    async def notify(self, match_id: int, recruiter_id: int):
         async with self.dal.uow as uow:
             match = await uow.get_match_detail(match_id)
 
@@ -63,6 +55,19 @@ class MatchService:
             if match.recruiter_id != recruiter_id:
                 raise ForbiddenMatchAccess(match_id, recruiter_id)
 
+            if match.resume_id is None or match.vacancy_id is None:
+                raise ValueError("Match is incomplete")
+
+            await self.notification_creator.on_match_created(uow, match)
+            await uow.commit()
+
+    async def get_by_id(self, match_id: int, recruiter_id: int) -> MatchDetailOut:
+        async with self.dal.uow as uow:
+            match = await uow.get_match_detail(match_id)
+            if not match:
+                raise MatchNotFound(match_id)
+            if match.recruiter_id != recruiter_id:
+                raise ForbiddenMatchAccess(match_id, recruiter_id)
             return MatchDetailOut.model_validate(match)
 
     async def list_by_recruiter(self, recruiter_id: int) -> list[MatchOut]:
@@ -78,71 +83,60 @@ class MatchService:
     ) -> MatchOut:
         async with self.dal.uow as uow:
             match = await uow.match.get_by_id(match_id)
-
             if not match:
                 raise MatchNotFound(match_id)
-
             if match.recruiter_id != recruiter_id:
                 raise ForbiddenMatchAccess(match_id, recruiter_id)
 
             match.is_active = data.is_active
-
             await uow.match.update(match)
             await uow.commit()
-
             return MatchOut.model_validate(match)
 
     async def update_acceptance(
-        self,
-        match_id: int,
-        recruiter_id: int,
-        data: MatchUpdateAcceptanceIn
+            self,
+            match_id: int,
+            recruiter_id: int,
+            data: MatchUpdateAcceptanceIn
     ) -> MatchOut:
         async with self.dal.uow as uow:
             match = await uow.get_match_detail(match_id)
-
             if not match:
                 raise MatchNotFound(match_id)
-
             if match.recruiter_id != recruiter_id:
                 raise ForbiddenMatchAccess(match_id, recruiter_id)
 
-            # обновляем флаги
+            if data.resume_id is not None:
+                match.resume_id = data.resume_id
+            if data.vacancy_id is not None:
+                match.vacancy_id = data.vacancy_id
+
             if data.applicant_accepted is not None:
                 match.applicant_accepted = data.applicant_accepted
-
             if data.employer_accepted is not None:
                 match.employer_accepted = data.employer_accepted
 
-            # =========================
-            # БИЗНЕС-ЛОГИКА СТАТУСА
-            # =========================
-
             if match.applicant_accepted is False or match.employer_accepted is False:
                 match.is_active = False
-
-            elif (
-                match.applicant_accepted is True
-                and match.employer_accepted is True
-            ):
+            elif match.applicant_accepted is True and match.employer_accepted is True:
                 match.is_active = False
 
             await uow.match.update(match)
 
+            await uow._session.flush()
 
-            await self.notification_creator.on_acceptance_changed(uow, match)
+            if match.resume_id is not None and match.vacancy_id is not None:
+                refreshed_match = await uow.get_match_detail(match_id)
+                await self.notification_creator.on_acceptance_changed(uow, refreshed_match)
 
             await uow.commit()
-
             return MatchOut.model_validate(match)
 
     async def delete(self, match_id: int, recruiter_id: int) -> None:
         async with self.dal.uow as uow:
             match = await uow.match.get_by_id(match_id)
-
             if not match:
                 raise MatchNotFound(match_id)
-
             if match.recruiter_id != recruiter_id:
                 raise ForbiddenMatchAccess(match_id, recruiter_id)
 
