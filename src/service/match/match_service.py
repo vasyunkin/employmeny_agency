@@ -94,10 +94,10 @@ class MatchService:
             return MatchOut.model_validate(match)
 
     async def update_acceptance(
-        self,
-        match_id: int,
-        recruiter_id: int,
-        data: MatchUpdateAcceptanceIn
+            self,
+            match_id: int,
+            recruiter_id: int,
+            data: MatchUpdateAcceptanceIn
     ) -> MatchOut:
         async with self.dal.uow as uow:
             match = await uow.get_match_detail(match_id)
@@ -105,6 +105,11 @@ class MatchService:
                 raise MatchNotFound(match_id)
             if match.recruiter_id != recruiter_id:
                 raise ForbiddenMatchAccess(match_id, recruiter_id)
+
+            if data.resume_id is not None:
+                match.resume_id = data.resume_id
+            if data.vacancy_id is not None:
+                match.vacancy_id = data.vacancy_id
 
             if data.applicant_accepted is not None:
                 match.applicant_accepted = data.applicant_accepted
@@ -118,8 +123,11 @@ class MatchService:
 
             await uow.match.update(match)
 
+            await uow._session.flush()
+
             if match.resume_id is not None and match.vacancy_id is not None:
-                await self.notification_creator.on_acceptance_changed(uow, match)
+                refreshed_match = await uow.get_match_detail(match_id)
+                await self.notification_creator.on_acceptance_changed(uow, refreshed_match)
 
             await uow.commit()
             return MatchOut.model_validate(match)

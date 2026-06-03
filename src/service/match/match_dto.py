@@ -16,10 +16,12 @@ class MatchUpdateStatusIn(BaseModel):
 
 
 class MatchUpdateAcceptanceIn(BaseModel):
-    """Обновление статуса принятия мэтча"""
+    """Обновление статуса принятия мэтча и привязка недостающих компонентов"""
     applicant_accepted: Optional[bool] = None
     employer_accepted: Optional[bool] = None
 
+    resume_id: Optional[int] = Field(default=None, gt=0)
+    vacancy_id: Optional[int] = Field(default=None, gt=0)
 
 class MatchOut(BaseModel):
     match_id: int

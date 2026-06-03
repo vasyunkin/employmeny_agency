@@ -36,7 +36,7 @@ class NotificationCreator:
             uow,
             applicant_id,
             "match_created",
-            f"Ваше резюме откликнуто на вакансию '{vacancy.title}'."
+            f"Подходящая вакансия для вас! -> '{vacancy.title}'."
         )
 
         await self._create(

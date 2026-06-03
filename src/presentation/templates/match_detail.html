@@ -9,13 +9,16 @@
 {% block content %}
 <div class="container py-3">
 
-    <h2 class="fw-bold mb-4">Сопоставление</h2>
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+        <h2 class="fw-bold m-0" style="color: #ffb07c;">Сопоставление</h2>
+        <button class="btn btn-outline-custom" onclick="location.href='/matches'">← К списку сопоставлений</button>
+    </div>
 
     <div id="matchContainer" class="match-container"></div>
 
     <div class="text-center mt-4">
-        <button class="btn btn-success px-4" onclick="notifySides()">
-            Уведомить стороны
+        <button class="btn btn-custom px-4" onclick="notifySides()">
+            🚀 Уведомить стороны
         </button>
     </div>
 
@@ -29,7 +32,10 @@ const matchId = window.location.pathname.split("/").pop();
 async function loadMatch() {
     const token = localStorage.getItem("token");
 
-    const res = await fetch(`/matches/${matchId}`, {
+    if (!token) window.location.href = "/";
+
+    // ИСПРАВЛЕНО: Добавлен префикс /api
+    const res = await fetch(`/api/matches/${matchId}`, {
         headers: { "Authorization": "Bearer " + token }
     });
 
@@ -49,23 +55,23 @@ function renderMatch(match) {
         <div class="row g-4">
 
             <div class="col-md-6">
-                <div class="match-card">
-                    <h5 class="fw-bold mb-3">Резюме</h5>
-                    ${renderResume(match.resume)}
+                <div class="match-card h-100">
+                    <h5 class="fw-bold mb-3" style="color: #ffb07c;">📄 Резюме</h5>
+                    ${match.resume ? renderResume(match.resume) : "<p class='text-muted'>Не выбрано</p>"}
                 </div>
             </div>
 
             <div class="col-md-6">
-                <div class="match-card">
-                    <h5 class="fw-bold mb-3">Вакансия</h5>
-                    ${renderVacancy(match.vacancy)}
+                <div class="match-card h-100">
+                    <h5 class="fw-bold mb-3" style="color: #ffb07c;">🏢 Вакансия</h5>
+                    ${match.vacancy ? renderVacancy(match.vacancy) : "<p class='text-muted'>Не выбрано</p>"}
                 </div>
             </div>
 
         </div>
 
         <div class="mt-4 text-center">
-            <span class="badge ${match.is_active ? 'bg-success' : 'bg-secondary'}">
+            <span class="badge py-2 px-3 ${match.is_active ? 'bg-success' : 'bg-secondary'}">
                 ${match.is_active ? 'Активно' : 'Завершено'}
             </span>
         </div>
@@ -74,20 +80,24 @@ function renderMatch(match) {
 
 function renderResume(r) {
     return `
-        <p><b>${r.desired_position}</b></p>
-        <p>💰 ${r.desired_salary ?? "не указана"}</p>
-        <p>📊 ${r.experience_years} лет</p>
-        <p>🧠 ${r.skills ?? "-"}</p>
-        <p>🎓 ${r.education ?? "-"}</p>
+        <h6 class="fw-bold text-light mb-2">${r.desired_position}</h6>
+        <p class="mb-1">💰 <b>Зарплата:</b> ${r.desired_salary ? r.desired_salary + ' руб.' : "не указана"}</p>
+        <p class="mb-3">📊 <b>Опыт:</b> ${r.experience_years} лет</p>
+        <p class="mb-2"><strong>🧠 Навыки:</strong></p>
+        <p class="text-muted"><span style="white-space: pre-line;">${r.skills ?? "-"}</span></p>
+        <p class="mb-2"><strong>🎓 Образование:</strong></p>
+        <p class="text-muted"><span style="white-space: pre-line;">${r.education ?? "-"}</span></p>
     `;
 }
 
 function renderVacancy(v) {
     return `
-        <p><b>${v.title}</b></p>
-        <p>💰 ${v.salary ?? "не указана"}</p>
-        <p>📋 ${v.requirements ?? "-"}</p>
-        <p>🛠 ${v.responsibilities ?? "-"}</p>
+        <h6 class="fw-bold text-light mb-2">${v.title}</h6>
+        <p class="mb-3">💰 <b>Зарплата:</b> ${v.salary ? v.salary + ' руб.' : "не указана"}</p>
+        <p class="mb-2"><strong>📋 Требования:</strong></p>
+        <p class="text-muted"><span style="white-space: pre-line;">${v.requirements ?? "-"}</span></p>
+        <p class="mb-2"><strong>🛠 Обязанности:</strong></p>
+        <p class="text-muted"><span style="white-space: pre-line;">${v.responsibilities ?? "-"}</span></p>
     `;
 }
 
@@ -98,7 +108,8 @@ function renderVacancy(v) {
 async function notifySides() {
     const token = localStorage.getItem("token");
 
-    const res = await fetch(`/matches/${matchId}/notify`, {
+    // ИСПРАВЛЕНО: Добавлен префикс /api
+    const res = await fetch(`/api/matches/${matchId}/notify`, {
         method: "POST",
         headers: {
             "Authorization": "Bearer " + token
@@ -106,7 +117,7 @@ async function notifySides() {
     });
 
     if (res.ok) {
-        alert("Уведомления отправлены");
+        alert("Уведомления успешно отправлены сторонам!");
     } else {
         const err = await res.json();
         alert(err.detail || "Ошибка уведомления");
