@@ -24,9 +24,19 @@ def create_app() -> FastAPI:
 
     @app.get("/", response_class=HTMLResponse)
     async def home(request: Request):
-        template = templates.env.get_template("index.html")
+        template = templates.env.get_template("auth.html")
         content = template.render({"request": request})
         return HTMLResponse(content)
+
+    @app.get("/resumes-page", response_class=HTMLResponse)
+    async def resumes_page(request: Request):
+        template = templates.env.get_template("items.html")
+        return HTMLResponse(template.render({"request": request}))
+
+    @app.get("/vacancies-page", response_class=HTMLResponse)
+    async def resumes_page(request: Request):
+        template = templates.env.get_template("items.html")
+        return HTMLResponse(template.render({"request": request}))
 
 
     app.include_router(auth_router)

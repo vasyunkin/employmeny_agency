@@ -128,10 +128,7 @@ class MatchService:
                 match.is_active = False
 
             await uow.match.update(match)
-
-            # уведомления (в той же транзакции!)
             await self.notification_creator.on_acceptance_changed(uow, match)
-
             await uow.commit()
 
             return MatchOut.model_validate(match)

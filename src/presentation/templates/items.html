@@ -1,0 +1,161 @@
+{% extends "layout.html" %}
+
+{% block title %}Мои данные{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/items.css">
+{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 id="pageTitle" class="fw-bold m-0"></h2>
+        <button id="createBtn" class="btn btn-custom"></button>
+    </div>
+
+    <div id="emptyMessage" class="text-center mt-5" style="display:none;">
+        <h5 class="text-muted">Упс, пока здесь ничего нет</h5>
+    </div>
+
+    <div id="itemsContainer" class="row g-4"></div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const token = localStorage.getItem("token");
+const payload = JSON.parse(atob(token.split('.')[1]));
+
+let config = {};
+
+function resolveConfig() {
+    if (payload.role === "applicant") {
+        config = {
+            title: "Мои резюме",
+            endpoint: "/resumes",
+            createText: "Создать резюме",
+            render: renderResume
+        };
+    } else if (payload.role === "employer") {
+        config = {
+            title: "Мои вакансии",
+            endpoint: "/vacancies",
+            createText: "Создать вакансию",
+            render: renderVacancy
+        };
+    } else {
+        config = {
+            title: "Мои сопоставления",
+            endpoint: "/matches",
+            createText: "Создать сопоставление",
+            render: renderMatch
+        };
+    }
+
+    document.getElementById("pageTitle").innerText = config.title;
+    document.getElementById("createBtn").innerText = config.createText;
+}
+
+async function loadItems() {
+    const res = await fetch(config.endpoint, {
+        headers: { "Authorization": "Bearer " + token }
+    });
+
+    const container = document.getElementById("itemsContainer");
+    const empty = document.getElementById("emptyMessage");
+
+    if (!res.ok) {
+        empty.style.display = "block";
+        return;
+    }
+
+    const data = await res.json();
+
+    if (data.length === 0) {
+        empty.style.display = "block";
+        return;
+    }
+
+    container.innerHTML = "";
+    empty.style.display = "none";
+
+    data.forEach(item => {
+        container.appendChild(config.render(item));
+    });
+}
+
+function baseCard(content) {
+    const col = document.createElement("div");
+    col.className = "col-md-6";
+
+    col.innerHTML = `
+        <div class="item-card">
+            ${content}
+        </div>
+    `;
+
+    return col;
+}
+
+/* ===== RENDERERS ===== */
+
+function renderResume(r) {
+    return baseCard(`
+        <h5 class="fw-bold mb-2">${r.desired_position}</h5>
+        <p class="mb-1">💰 Зарплата: ${r.desired_salary ?? "не указана"}</p>
+        <p class="mb-3">📊 Опыт: ${r.experience_years} лет</p>
+
+        <button class="btn btn-outline-custom w-100"
+            onclick="openItem('/resumes/${r.resume_id}')">
+            Подробнее
+        </button>
+    `);
+}
+
+function renderVacancy(v) {
+    return baseCard(`
+        <h5 class="fw-bold mb-2">${v.title}</h5>
+        <p class="mb-1">💰 Зарплата: ${v.salary ?? "не указана"}</p>
+        <p class="mb-3">📄 Требования: ${v.requirements ?? "-"}</p>
+
+        <button class="btn btn-outline-custom w-100"
+            onclick="openItem('/vacancies/${v.vacancy_id}')">
+            Подробнее
+        </button>
+    `);
+}
+
+function renderMatch(m) {
+    return baseCard(`
+        <h5 class="fw-bold mb-2">Match #${m.match_id}</h5>
+        <p class="mb-1">📄 Resume ID: ${m.resume_id}</p>
+        <p class="mb-1">🏢 Vacancy ID: ${m.vacancy_id}</p>
+        <p class="mb-3">📊 Активен: ${m.is_active ? "Да" : "Нет"}</p>
+
+        <button class="btn btn-outline-custom w-100"
+            onclick="openItem('/matches/${m.match_id}')">
+            Подробнее
+        </button>
+    `);
+}
+
+/* ===== HELPERS ===== */
+
+function openItem(url) {
+    window.location.href = url;
+}
+
+function createItem() {
+    alert("Форма создания будет следующей страницей");
+}
+
+document.getElementById("createBtn").onclick = createItem;
+
+document.addEventListener("DOMContentLoaded", () => {
+    resolveConfig();
+    loadItems();
+});
+</script>
+{% endblock %}
