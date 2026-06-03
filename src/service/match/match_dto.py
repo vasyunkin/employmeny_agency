@@ -23,8 +23,8 @@ class MatchUpdateAcceptanceIn(BaseModel):
 
 class MatchOut(BaseModel):
     match_id: int
-    resume_id: int
-    vacancy_id: int
+    resume_id: Optional[int]
+    vacancy_id: Optional[int]
     recruiter_id: int
     is_active: bool
     applicant_accepted: Optional[bool] = None
@@ -41,8 +41,8 @@ class MatchListOut(BaseModel):
 class MatchDetailOut(BaseModel):
     """Полная информация о мэтче для рекрутера"""
     match_id: int
-    resume_id: int
-    vacancy_id: int
+    resume_id: Optional[int]
+    vacancy_id: Optional[int]
     recruiter_id: int
     is_active: bool
     applicant_accepted: Optional[bool] = None

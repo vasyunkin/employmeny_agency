@@ -24,8 +24,8 @@ class ServiceProvider(Provider):
         return VacancyService(dal)
 
     @provide(scope=Scope.REQUEST)
-    def match_service(self, dal: DALFacade) -> MatchService:
-        return MatchService(dal)
+    def match_service(self, dal: DALFacade, notification_creator: NotificationCreator) -> MatchService:
+        return MatchService(dal, notification_creator)
 
     @provide(scope=Scope.REQUEST)
     def notification_service(self, dal: DALFacade) -> NotificationService:

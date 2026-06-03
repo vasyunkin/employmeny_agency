@@ -9,7 +9,10 @@
 {% block content %}
 <div class="container py-3">
 
-    <h2 class="fw-bold mb-4">Выберите элемент для сопоставления</h2>
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+        <h2 class="fw-bold m-0" id="pageTitle">Выберите элемент для сопоставления</h2>
+        <button class="btn btn-outline-custom" onclick="location.href='/matches'">← Отмена</button>
+    </div>
 
     <div id="itemsContainer" class="row g-4"></div>
 
@@ -24,23 +27,34 @@
 <script>
 const params = new URLSearchParams(window.location.search);
 const type = params.get("type"); // resume или vacancy
+const token = localStorage.getItem("token");
+
+if (!token) window.location.href = "/";
 
 async function loadItems() {
     const container = document.getElementById("itemsContainer");
     const emptyMessage = document.getElementById("emptyMessage");
+    const pageTitle = document.getElementById("pageTitle");
 
     let url = "";
 
     if (type === "resume") {
-        url = "/resumes/search/";
+        pageTitle.innerText = "Выберите резюме для сопоставления";
+        url = "/api/resumes/search/"; // Добавлен префикс /api
     } else if (type === "vacancy") {
-        url = "/vacancies/search/";
+        pageTitle.innerText = "Выберите вакансию для сопоставления";
+        url = "/api/vacancies/search/"; // Добавлен префикс /api
     } else {
         emptyMessage.style.display = "block";
         return;
     }
 
-    const res = await fetch(url);
+    // Делаем запрос с передачей токена авторизации
+    const res = await fetch(url, {
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    });
 
     if (!res.ok) {
         emptyMessage.style.display = "block";
@@ -49,19 +63,18 @@ async function loadItems() {
 
     const items = await res.json();
 
-    if (items.length === 0) {
+    if (!items || items.length === 0) {
         emptyMessage.style.display = "block";
         return;
     }
 
+    emptyMessage.style.display = "none";
     container.innerHTML = "";
 
     items.forEach(item => {
         const card = document.createElement("div");
         card.className = "col-md-6";
-
         card.innerHTML = renderCard(item);
-
         container.appendChild(card);
     });
 }
@@ -70,23 +83,21 @@ function renderCard(item) {
     if (type === "resume") {
         return `
             <div class="match-card">
-                <h5 class="fw-bold">${item.desired_position}</h5>
-                <p>💰 ${item.desired_salary ?? "не указана"}</p>
-                <p>📊 ${item.experience_years} лет опыта</p>
+                <h5 class="fw-bold" style="color: #ffb07c;">${item.desired_position}</h5>
+                <p>💰 ${item.desired_salary ? item.desired_salary + ' руб.' : "не указана"}</p>
+                <p>📊 Опыт: ${item.experience_years} лет</p>
 
                 <div class="details" style="display:none;">
-                    <hr>
-                    <p><strong>Навыки:</strong><br>${item.skills ?? "-"}</p>
-                    <p><strong>Образование:</strong><br>${item.education ?? "-"}</p>
+                    <hr class="border-secondary">
+                    <p><strong>Навыки:</strong><br><span style="white-space: pre-line;">${item.skills ?? "-"}</span></p>
+                    <p><strong>Образование:</strong><br><span style="white-space: pre-line;">${item.education ?? "-"}</span></p>
                 </div>
 
-                <button class="btn btn-outline-custom w-100 mb-2"
-                    onclick="toggleDetails(this)">
+                <button class="btn btn-outline-custom w-100 mb-2" onclick="toggleDetails(this)">
                     Подробнее
                 </button>
 
-                <button class="btn btn-custom w-100"
-                    onclick="selectItem(${item.resume_id})">
+                <button class="btn btn-custom w-100" onclick="selectItem(${item.resume_id})">
                     Добавить в сопоставление
                 </button>
             </div>
@@ -96,22 +107,20 @@ function renderCard(item) {
     if (type === "vacancy") {
         return `
             <div class="match-card">
-                <h5 class="fw-bold">${item.title}</h5>
-                <p>💰 ${item.salary ?? "не указана"}</p>
+                <h5 class="fw-bold" style="color: #ffb07c;">${item.title}</h5>
+                <p>💰 ${item.salary ? item.salary + ' руб.' : "не указана"}</p>
 
                 <div class="details" style="display:none;">
-                    <hr>
-                    <p><strong>Требования:</strong><br>${item.requirements ?? "-"}</p>
-                    <p><strong>Обязанности:</strong><br>${item.responsibilities ?? "-"}</p>
+                    <hr class="border-secondary">
+                    <p><strong>Требования:</strong><br><span style="white-space: pre-line;">${item.requirements ?? "-"}</span></p>
+                    <p><strong>Обязанности:</strong><br><span style="white-space: pre-line;">${item.responsibilities ?? "-"}</span></p>
                 </div>
 
-                <button class="btn btn-outline-custom w-100 mb-2"
-                    onclick="toggleDetails(this)">
+                <button class="btn btn-outline-custom w-100 mb-2" onclick="toggleDetails(this)">
                     Подробнее
                 </button>
 
-                <button class="btn btn-custom w-100"
-                    onclick="selectItem(${item.vacancy_id})">
+                <button class="btn btn-custom w-100" onclick="selectItem(${item.vacancy_id})">
                     Добавить в сопоставление
                 </button>
             </div>
@@ -128,8 +137,6 @@ function toggleDetails(btn) {
 }
 
 async function selectItem(id) {
-    const token = localStorage.getItem("token");
-
     let body = {};
 
     if (type === "resume") {
@@ -138,7 +145,8 @@ async function selectItem(id) {
         body = { resume_id: null, vacancy_id: id };
     }
 
-    const res = await fetch("/matches", {
+    // Обновлен роут создания сопоставления на /api/matches
+    const res = await fetch("/api/matches", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -154,7 +162,7 @@ async function selectItem(id) {
 
     const data = await res.json();
 
-    // переходим на выбор второго элемента
+    // Переходим на выбор второго элемента
     if (type === "resume") {
         window.location.href = `/match-select-second?match_id=${data.match_id}&type=vacancy`;
     } else {

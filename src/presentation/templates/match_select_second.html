@@ -9,18 +9,19 @@
 {% block content %}
 <div class="container py-3">
 
-    <h2 class="fw-bold mb-4">Выберите второй элемент</h2>
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+        <h2 class="fw-bold m-0" style="color: #ffb07c;">Выберите второй элемент</h2>
+        <button class="btn btn-outline-custom" onclick="location.href='/matches-page'">← Отмена</button>
+    </div>
 
     <div class="row g-4">
 
-        <!-- ЛЕВАЯ ЧАСТЬ (выбранный элемент) -->
         <div class="col-md-5">
             <div id="selectedItem" class="selected-card">
-                Загрузка...
+                <div class="text-center text-muted py-4">Загрузка выбранного элемента...</div>
             </div>
         </div>
 
-        <!-- ПРАВАЯ ЧАСТЬ (поиск второго) -->
         <div class="col-md-7">
             <div id="itemsContainer" class="row g-4"></div>
 
@@ -40,13 +41,15 @@ const params = new URLSearchParams(window.location.search);
 
 const matchId = params.get("match_id");
 const type = params.get("type"); // что ищем сейчас (resume / vacancy)
+const token = localStorage.getItem("token");
+
+if (!token) window.location.href = "/";
 
 let selectedMatch = null;
 
 async function loadMatch() {
-    const token = localStorage.getItem("token");
-
-    const res = await fetch(`/matches/${matchId}`, {
+    // Добавлен префикс /api
+    const res = await fetch(`/api/matches/${matchId}`, {
         headers: {
             "Authorization": "Bearer " + token
         }
@@ -58,7 +61,6 @@ async function loadMatch() {
     }
 
     selectedMatch = await res.json();
-
     renderSelected();
 }
 
@@ -69,15 +71,15 @@ function renderSelected() {
         const r = selectedMatch.resume;
 
         container.innerHTML = `
-            <h5 class="fw-bold mb-3">Выбрано резюме</h5>
-            <h6>${r.desired_position}</h6>
-            <p>💰 ${r.desired_salary ?? "не указана"}</p>
-            <p>📊 ${r.experience_years} лет</p>
+            <h5 class="fw-bold mb-3" style="color: #ffb07c;">Выбрано резюме</h5>
+            <h6 class="fw-bold text-light">${r.desired_position}</h6>
+            <p class="mb-1">💰 ${r.desired_salary ? r.desired_salary + ' руб.' : "не указана"}</p>
+            <p class="mb-3">📊 Опыт: ${r.experience_years} лет</p>
 
-            <hr>
+            <hr class="border-secondary">
 
-            <p><strong>Навыки:</strong><br>${r.skills ?? "-"}</p>
-            <p><strong>Образование:</strong><br>${r.education ?? "-"}</p>
+            <p><strong>Навыки:</strong><br><span style="white-space: pre-line;">${r.skills ?? "-"}</span></p>
+            <p><strong>Образование:</strong><br><span style="white-space: pre-line;">${r.education ?? "-"}</span></p>
         `;
     }
 
@@ -85,14 +87,14 @@ function renderSelected() {
         const v = selectedMatch.vacancy;
 
         container.innerHTML = `
-            <h5 class="fw-bold mb-3">Выбрана вакансия</h5>
-            <h6>${v.title}</h6>
-            <p>💰 ${v.salary ?? "не указана"}</p>
+            <h5 class="fw-bold mb-3" style="color: #ffb07c;">Выбрана вакансия</h5>
+            <h6 class="fw-bold text-light">${v.title}</h6>
+            <p class="mb-3">💰 ${v.salary ? v.salary + ' руб.' : "не указана"}</p>
 
-            <hr>
+            <hr class="border-secondary">
 
-            <p><strong>Требования:</strong><br>${v.requirements ?? "-"}</p>
-            <p><strong>Обязанности:</strong><br>${v.responsibilities ?? "-"}</p>
+            <p><strong>Требования:</strong><br><span style="white-space: pre-line;">${v.requirements ?? "-"}</span></p>
+            <p><strong>Обязанности:</strong><br><span style="white-space: pre-line;">${v.responsibilities ?? "-"}</span></p>
         `;
     }
 }
@@ -101,12 +103,19 @@ async function loadItems() {
     let url = "";
 
     if (type === "resume") {
-        url = "/resumes/search/";
+        url = "/api/resumes/search/"; // Добавлен префикс /api
     } else if (type === "vacancy") {
-        url = "/vacancies/search/";
+        url = "/api/vacancies/search/"; // Добавлен префикс /api
+    } else {
+        return;
     }
 
-    const res = await fetch(url);
+    // Добавлена авторизация токеном для поиска элементов
+    const res = await fetch(url, {
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    });
 
     const container = document.getElementById("itemsContainer");
     const emptyMessage = document.getElementById("emptyMessage");
@@ -118,19 +127,18 @@ async function loadItems() {
 
     const items = await res.json();
 
-    if (items.length === 0) {
+    if (!items || items.length === 0) {
         emptyMessage.style.display = "block";
         return;
     }
 
+    emptyMessage.style.display = "none";
     container.innerHTML = "";
 
     items.forEach(item => {
         const card = document.createElement("div");
         card.className = "col-md-6";
-
         card.innerHTML = renderCard(item);
-
         container.appendChild(card);
     });
 }
@@ -139,23 +147,21 @@ function renderCard(item) {
     if (type === "resume") {
         return `
             <div class="match-card">
-                <h5 class="fw-bold">${item.desired_position}</h5>
-                <p>💰 ${item.desired_salary ?? "не указана"}</p>
-                <p>📊 ${item.experience_years} лет</p>
+                <h5 class="fw-bold text-light">${item.desired_position}</h5>
+                <p class="mb-1">💰 ${item.desired_salary ? item.desired_salary + ' руб.' : "не указана"}</p>
+                <p class="mb-3">📊 Опыт: ${item.experience_years} лет</p>
 
                 <div class="details" style="display:none;">
-                    <hr>
-                    <p><strong>Навыки:</strong><br>${item.skills ?? "-"}</p>
-                    <p><strong>Образование:</strong><br>${item.education ?? "-"}</p>
+                    <hr class="border-secondary">
+                    <p><strong>Навыки:</strong><br><span style="white-space: pre-line;">${item.skills ?? "-"}</span></p>
+                    <p><strong>Образование:</strong><br><span style="white-space: pre-line;">${item.education ?? "-"}</span></p>
                 </div>
 
-                <button class="btn btn-outline-custom w-100 mb-2"
-                    onclick="toggleDetails(this)">
+                <button class="btn btn-outline-custom w-100 mb-2" onclick="toggleDetails(this)">
                     Подробнее
                 </button>
 
-                <button class="btn btn-custom w-100"
-                    onclick="completeMatch(${item.resume_id})">
+                <button class="btn btn-custom w-100" onclick="completeMatch(${item.resume_id})">
                     Добавить в сопоставление
                 </button>
             </div>
@@ -165,22 +171,20 @@ function renderCard(item) {
     if (type === "vacancy") {
         return `
             <div class="match-card">
-                <h5 class="fw-bold">${item.title}</h5>
-                <p>💰 ${item.salary ?? "не указана"}</p>
+                <h5 class="fw-bold text-light">${item.title}</h5>
+                <p class="mb-3">💰 ${item.salary ? item.salary + ' руб.' : "не указана"}</p>
 
                 <div class="details" style="display:none;">
-                    <hr>
-                    <p><strong>Требования:</strong><br>${item.requirements ?? "-"}</p>
-                    <p><strong>Обязанности:</strong><br>${item.responsibilities ?? "-"}</p>
+                    <hr class="border-secondary">
+                    <p><strong>Требования:</strong><br><span style="white-space: pre-line;">${item.requirements ?? "-"}</span></p>
+                    <p><strong>Обязанности:</strong><br><span style="white-space: pre-line;">${item.responsibilities ?? "-"}</span></p>
                 </div>
 
-                <button class="btn btn-outline-custom w-100 mb-2"
-                    onclick="toggleDetails(this)">
+                <button class="btn btn-outline-custom w-100 mb-2" onclick="toggleDetails(this)">
                     Подробнее
                 </button>
 
-                <button class="btn btn-custom w-100"
-                    onclick="completeMatch(${item.vacancy_id})">
+                <button class="btn btn-custom w-100" onclick="completeMatch(${item.vacancy_id})">
                     Добавить в сопоставление
                 </button>
             </div>
@@ -197,8 +201,6 @@ function toggleDetails(btn) {
 }
 
 async function completeMatch(id) {
-    const token = localStorage.getItem("token");
-
     let body = {};
 
     if (type === "resume") {
@@ -207,7 +209,8 @@ async function completeMatch(id) {
         body = { vacancy_id: id };
     }
 
-    const res = await fetch(`/matches/${matchId}/acceptance`, {
+    // Добавлен префикс /api к PATCH-запросу
+    const res = await fetch(`/api/matches/${matchId}/acceptance`, {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json",
@@ -221,7 +224,7 @@ async function completeMatch(id) {
         return;
     }
 
-    // финальный экран (позже сделаем)
+    // Редирект на красивую HTML-страницу деталей сопоставления
     window.location.href = `/matches/${matchId}`;
 }
 
