@@ -1,0 +1,36 @@
+h2 {
+    color: #ffb07c;
+}
+
+/* Карточка */
+.match-card {
+    background-color: #211e1b;
+    border: 1px solid #332e29;
+    border-radius: 16px;
+    padding: 25px;
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.match-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+/* Детали */
+.details {
+    font-size: 0.9rem;
+    color: #d7cec7;
+}
+
+/* Кнопка outline */
+.btn-outline-custom {
+    border: 1px solid #ffb07c;
+    color: #ffb07c;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-custom:hover {
+    background-color: rgba(255, 176, 124, 0.1);
+}

@@ -1,0 +1,167 @@
+{% extends "layout.html" %}
+
+{% block title %}Выбор для сопоставления{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/match_select.css">
+{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+
+    <h2 class="fw-bold mb-4">Выберите элемент для сопоставления</h2>
+
+    <div id="itemsContainer" class="row g-4"></div>
+
+    <div id="emptyMessage" class="text-center mt-5" style="display:none;">
+        <h5 class="text-muted">Ничего не найдено</h5>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const params = new URLSearchParams(window.location.search);
+const type = params.get("type"); // resume или vacancy
+
+async function loadItems() {
+    const container = document.getElementById("itemsContainer");
+    const emptyMessage = document.getElementById("emptyMessage");
+
+    let url = "";
+
+    if (type === "resume") {
+        url = "/resumes/search/";
+    } else if (type === "vacancy") {
+        url = "/vacancies/search/";
+    } else {
+        emptyMessage.style.display = "block";
+        return;
+    }
+
+    const res = await fetch(url);
+
+    if (!res.ok) {
+        emptyMessage.style.display = "block";
+        return;
+    }
+
+    const items = await res.json();
+
+    if (items.length === 0) {
+        emptyMessage.style.display = "block";
+        return;
+    }
+
+    container.innerHTML = "";
+
+    items.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "col-md-6";
+
+        card.innerHTML = renderCard(item);
+
+        container.appendChild(card);
+    });
+}
+
+function renderCard(item) {
+    if (type === "resume") {
+        return `
+            <div class="match-card">
+                <h5 class="fw-bold">${item.desired_position}</h5>
+                <p>💰 ${item.desired_salary ?? "не указана"}</p>
+                <p>📊 ${item.experience_years} лет опыта</p>
+
+                <div class="details" style="display:none;">
+                    <hr>
+                    <p><strong>Навыки:</strong><br>${item.skills ?? "-"}</p>
+                    <p><strong>Образование:</strong><br>${item.education ?? "-"}</p>
+                </div>
+
+                <button class="btn btn-outline-custom w-100 mb-2"
+                    onclick="toggleDetails(this)">
+                    Подробнее
+                </button>
+
+                <button class="btn btn-custom w-100"
+                    onclick="selectItem(${item.resume_id})">
+                    Добавить в сопоставление
+                </button>
+            </div>
+        `;
+    }
+
+    if (type === "vacancy") {
+        return `
+            <div class="match-card">
+                <h5 class="fw-bold">${item.title}</h5>
+                <p>💰 ${item.salary ?? "не указана"}</p>
+
+                <div class="details" style="display:none;">
+                    <hr>
+                    <p><strong>Требования:</strong><br>${item.requirements ?? "-"}</p>
+                    <p><strong>Обязанности:</strong><br>${item.responsibilities ?? "-"}</p>
+                </div>
+
+                <button class="btn btn-outline-custom w-100 mb-2"
+                    onclick="toggleDetails(this)">
+                    Подробнее
+                </button>
+
+                <button class="btn btn-custom w-100"
+                    onclick="selectItem(${item.vacancy_id})">
+                    Добавить в сопоставление
+                </button>
+            </div>
+        `;
+    }
+}
+
+function toggleDetails(btn) {
+    const details = btn.previousElementSibling;
+    const isHidden = details.style.display === "none";
+
+    details.style.display = isHidden ? "block" : "none";
+    btn.innerText = isHidden ? "Скрыть" : "Подробнее";
+}
+
+async function selectItem(id) {
+    const token = localStorage.getItem("token");
+
+    let body = {};
+
+    if (type === "resume") {
+        body = { resume_id: id, vacancy_id: null };
+    } else {
+        body = { resume_id: null, vacancy_id: id };
+    }
+
+    const res = await fetch("/matches", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+        alert("Ошибка создания сопоставления");
+        return;
+    }
+
+    const data = await res.json();
+
+    // переходим на выбор второго элемента
+    if (type === "resume") {
+        window.location.href = `/match-select-second?match_id=${data.match_id}&type=vacancy`;
+    } else {
+        window.location.href = `/match-select-second?match_id=${data.match_id}&type=resume`;
+    }
+}
+
+document.addEventListener("DOMContentLoaded", loadItems);
+</script>
+{% endblock %}

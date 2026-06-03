@@ -6,8 +6,8 @@ from src.service.vacancy.vacancy_dto import VacancyOut
 
 
 class MatchCreateIn(BaseModel):
-    resume_id: int = Field(gt=0)
-    vacancy_id: int = Field(gt=0)
+    resume_id: Optional[int] = Field(default=None, gt=0)
+    vacancy_id: Optional[int] = Field(default=None, gt=0)
 
 
 class MatchUpdateStatusIn(BaseModel):
@@ -48,7 +48,7 @@ class MatchDetailOut(BaseModel):
     applicant_accepted: Optional[bool] = None
     employer_accepted: Optional[bool] = None
 
-    resume: ResumeOut
-    vacancy: VacancyOut
+    resume: Optional[ResumeOut]
+    vacancy: Optional[VacancyOut]
 
     model_config = ConfigDict(from_attributes=True)

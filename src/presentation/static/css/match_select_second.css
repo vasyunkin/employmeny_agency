@@ -1,0 +1,233 @@
+{% extends "layout.html" %}
+
+{% block title %}Завершение сопоставления{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/match_select_second.css">
+{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+
+    <h2 class="fw-bold mb-4">Выберите второй элемент</h2>
+
+    <div class="row g-4">
+
+        <!-- ЛЕВАЯ ЧАСТЬ (выбранный элемент) -->
+        <div class="col-md-5">
+            <div id="selectedItem" class="selected-card">
+                Загрузка...
+            </div>
+        </div>
+
+        <!-- ПРАВАЯ ЧАСТЬ (поиск второго) -->
+        <div class="col-md-7">
+            <div id="itemsContainer" class="row g-4"></div>
+
+            <div id="emptyMessage" class="text-center mt-5" style="display:none;">
+                <h5 class="text-muted">Ничего не найдено</h5>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const params = new URLSearchParams(window.location.search);
+
+const matchId = params.get("match_id");
+const type = params.get("type"); // что ищем сейчас (resume / vacancy)
+
+let selectedMatch = null;
+
+async function loadMatch() {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`/matches/${matchId}`, {
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    });
+
+    if (!res.ok) {
+        alert("Ошибка загрузки сопоставления");
+        return;
+    }
+
+    selectedMatch = await res.json();
+
+    renderSelected();
+}
+
+function renderSelected() {
+    const container = document.getElementById("selectedItem");
+
+    if (selectedMatch.resume && !selectedMatch.vacancy) {
+        const r = selectedMatch.resume;
+
+        container.innerHTML = `
+            <h5 class="fw-bold mb-3">Выбрано резюме</h5>
+            <h6>${r.desired_position}</h6>
+            <p>💰 ${r.desired_salary ?? "не указана"}</p>
+            <p>📊 ${r.experience_years} лет</p>
+
+            <hr>
+
+            <p><strong>Навыки:</strong><br>${r.skills ?? "-"}</p>
+            <p><strong>Образование:</strong><br>${r.education ?? "-"}</p>
+        `;
+    }
+
+    if (selectedMatch.vacancy && !selectedMatch.resume) {
+        const v = selectedMatch.vacancy;
+
+        container.innerHTML = `
+            <h5 class="fw-bold mb-3">Выбрана вакансия</h5>
+            <h6>${v.title}</h6>
+            <p>💰 ${v.salary ?? "не указана"}</p>
+
+            <hr>
+
+            <p><strong>Требования:</strong><br>${v.requirements ?? "-"}</p>
+            <p><strong>Обязанности:</strong><br>${v.responsibilities ?? "-"}</p>
+        `;
+    }
+}
+
+async function loadItems() {
+    let url = "";
+
+    if (type === "resume") {
+        url = "/resumes/search/";
+    } else if (type === "vacancy") {
+        url = "/vacancies/search/";
+    }
+
+    const res = await fetch(url);
+
+    const container = document.getElementById("itemsContainer");
+    const emptyMessage = document.getElementById("emptyMessage");
+
+    if (!res.ok) {
+        emptyMessage.style.display = "block";
+        return;
+    }
+
+    const items = await res.json();
+
+    if (items.length === 0) {
+        emptyMessage.style.display = "block";
+        return;
+    }
+
+    container.innerHTML = "";
+
+    items.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "col-md-6";
+
+        card.innerHTML = renderCard(item);
+
+        container.appendChild(card);
+    });
+}
+
+function renderCard(item) {
+    if (type === "resume") {
+        return `
+            <div class="match-card">
+                <h5 class="fw-bold">${item.desired_position}</h5>
+                <p>💰 ${item.desired_salary ?? "не указана"}</p>
+                <p>📊 ${item.experience_years} лет</p>
+
+                <div class="details" style="display:none;">
+                    <hr>
+                    <p><strong>Навыки:</strong><br>${item.skills ?? "-"}</p>
+                    <p><strong>Образование:</strong><br>${item.education ?? "-"}</p>
+                </div>
+
+                <button class="btn btn-outline-custom w-100 mb-2"
+                    onclick="toggleDetails(this)">
+                    Подробнее
+                </button>
+
+                <button class="btn btn-custom w-100"
+                    onclick="completeMatch(${item.resume_id})">
+                    Добавить в сопоставление
+                </button>
+            </div>
+        `;
+    }
+
+    if (type === "vacancy") {
+        return `
+            <div class="match-card">
+                <h5 class="fw-bold">${item.title}</h5>
+                <p>💰 ${item.salary ?? "не указана"}</p>
+
+                <div class="details" style="display:none;">
+                    <hr>
+                    <p><strong>Требования:</strong><br>${item.requirements ?? "-"}</p>
+                    <p><strong>Обязанности:</strong><br>${item.responsibilities ?? "-"}</p>
+                </div>
+
+                <button class="btn btn-outline-custom w-100 mb-2"
+                    onclick="toggleDetails(this)">
+                    Подробнее
+                </button>
+
+                <button class="btn btn-custom w-100"
+                    onclick="completeMatch(${item.vacancy_id})">
+                    Добавить в сопоставление
+                </button>
+            </div>
+        `;
+    }
+}
+
+function toggleDetails(btn) {
+    const details = btn.previousElementSibling;
+    const isHidden = details.style.display === "none";
+
+    details.style.display = isHidden ? "block" : "none";
+    btn.innerText = isHidden ? "Скрыть" : "Подробнее";
+}
+
+async function completeMatch(id) {
+    const token = localStorage.getItem("token");
+
+    let body = {};
+
+    if (type === "resume") {
+        body = { resume_id: id };
+    } else {
+        body = { vacancy_id: id };
+    }
+
+    const res = await fetch(`/matches/${matchId}/acceptance`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+        alert("Ошибка завершения сопоставления");
+        return;
+    }
+
+    // финальный экран (позже сделаем)
+    window.location.href = `/matches/${matchId}`;
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadMatch();
+    await loadItems();
+});
+</script>
+{% endblock %}
